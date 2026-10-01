@@ -65,4 +65,4 @@ Public: `/`, `/services`, `/service/[slug]`, `/gallery`, `/about`, `/contact`, `
 
 Account: `/login`, `/account`, `/account/bookings/[id]`, `/booking/confirmation`.
 
-Admin: `/admin` (protected by the database membership table).
+Admin: `/admin` (protected by the database membership table). 132323213
