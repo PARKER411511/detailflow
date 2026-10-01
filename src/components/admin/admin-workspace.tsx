@@ -261,21 +261,21 @@ export function AdminWorkspace({
             type="button"
             key={value}
             onClick={() => setTab(value)}
-            className={`px-4 py-2 text-sm font-semibold ${tab === value ? "bg-[#2563eb] text-white" : "text-slate-500 hover:bg-slate-50"}`}
+            className={`px-4 py-2 text-sm font-semibold ${tab === value ? "bg-[#173e8d] text-white" : "text-slate-500 hover:bg-slate-50"}`}
           >
             {label}
           </button>
         ))}
       </div>
       {loadingTab && (
-        <p role="status" className="mt-5 rounded-xl bg-slate-50 p-3 text-sm text-slate-600">
+        <p role="status" className="mt-5 rounded-md bg-slate-50 p-3 text-sm text-slate-600">
           Loading {loadingTab === "schedule" ? "hours and blocked intervals" : "customers"}…
         </p>
       )}
       {notice && (
         <p
           role={notice.kind === "error" ? "alert" : "status"}
-          className={`mt-5 rounded-xl p-3 text-sm ${notice.kind === "error" ? "bg-rose-50 text-rose-800" : "bg-emerald-50 text-emerald-800"}`}
+          className={`mt-5 rounded-md p-3 text-sm ${notice.kind === "error" ? "bg-rose-50 text-rose-800" : "bg-emerald-50 text-emerald-800"}`}
         >
           {notice.text}
         </p>
@@ -364,7 +364,7 @@ function BookingsPanel({
             onChange={(event) =>
               setFilters({ ...filters, date: event.target.value })
             }
-            className="mt-2 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-normal text-slate-700"
+            className="field mt-2 font-normal"
           />
         </label>
         <label className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
@@ -374,7 +374,7 @@ function BookingsPanel({
             onChange={(event) =>
               setFilters({ ...filters, service: event.target.value })
             }
-            className="mt-2 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-normal text-slate-700"
+            className="field mt-2 font-normal"
           >
             <option value="all">All services</option>
             {services.map((service) => (
@@ -389,7 +389,7 @@ function BookingsPanel({
             onChange={(event) =>
               setFilters({ ...filters, status: event.target.value })
             }
-            className="mt-2 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-normal capitalize text-slate-700"
+            className="field mt-2 font-normal capitalize"
           >
             <option value="all">All statuses</option>
             {[
@@ -526,7 +526,7 @@ function ServicesPanel({
         <button
           type="button"
           onClick={() => setEditing({ id: "", ...blankService })}
-          className="bg-[#2563eb] px-4 py-2 text-sm font-semibold text-white"
+          className="action-primary px-4 py-2 text-sm"
         >
           Add service
         </button>
@@ -599,7 +599,7 @@ function ServicesPanel({
               type="button"
               onClick={saveService}
               disabled={saving}
-              className="rounded-full bg-[#0b1739] px-5 py-3 text-sm font-semibold text-white"
+              className="action-primary px-5 py-3 text-sm"
             >
               {saving ? "Saving…" : "Save service"}
             </button>
@@ -658,7 +658,7 @@ function Field({
       <input
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-700"
+        className="field mt-2 font-normal normal-case tracking-normal"
       />
     </label>
   );
@@ -755,7 +755,7 @@ function SchedulePanel({
                       ),
                     )
                   }
-                  className="mt-3 w-full rounded-lg border border-slate-200 px-2 py-2 text-sm"
+                  className="field mt-3 px-2 py-2 text-sm"
                 />
                 <input
                   type="time"
@@ -770,7 +770,7 @@ function SchedulePanel({
                       ),
                     )
                   }
-                  className="mt-2 w-full rounded-lg border border-slate-200 px-2 py-2 text-sm"
+                  className="field mt-2 px-2 py-2 text-sm"
                 />
               </>
             )}
@@ -802,7 +802,7 @@ function SchedulePanel({
               onChange={(event) =>
                 setBlockForm({ ...blockForm, starts_at: event.target.value })
               }
-              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-normal"
+              className="field mt-2 font-normal"
             />
           </label>
           <label className="text-xs font-semibold text-slate-500">
@@ -814,7 +814,7 @@ function SchedulePanel({
               onChange={(event) =>
                 setBlockForm({ ...blockForm, ends_at: event.target.value })
               }
-              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-normal"
+              className="field mt-2 font-normal"
             />
           </label>
           <label className="text-xs font-semibold text-slate-500">
@@ -825,13 +825,13 @@ function SchedulePanel({
               onChange={(event) =>
                 setBlockForm({ ...blockForm, reason: event.target.value })
               }
-              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-normal"
+              className="field mt-2 font-normal"
             />
           </label>
           <button
             type="submit"
             disabled={saving !== null}
-            className="rounded-full bg-[#0b1739] px-4 py-3 text-sm font-semibold text-white sm:col-span-3 sm:justify-self-start"
+            className="action-primary px-4 py-3 text-sm sm:col-span-3 sm:justify-self-start"
           >
             {saving === "block" ? "Saving…" : blockForm.id ? "Save blocked interval" : "Add blocked interval"}
           </button>
@@ -969,7 +969,7 @@ function CustomersPanel({ customers, studioTimezone }: { customers: Customer[]; 
                 <button
                   type="button"
                   onClick={() => toggleHistory(customer.id)}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-blue-600 hover:border-blue-300 sm:w-auto"
+                  className="rounded-md border border-slate-200 px-3 py-2 text-xs font-semibold text-blue-600 hover:border-blue-300 sm:w-auto"
                 >
                   {expanded === customer.id ? "Hide history" : "View history"}
                 </button>

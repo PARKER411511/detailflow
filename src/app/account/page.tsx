@@ -33,7 +33,7 @@ export default async function AccountPage() {
           </p>
           <Link
             href="/booking"
-            className="mt-8 inline-flex bg-[#2563eb] px-5 py-3 text-sm font-semibold text-white"
+            className="action-primary mt-8 inline-flex px-5 py-3 text-sm"
           >
             Return to booking
           </Link>
@@ -89,7 +89,7 @@ export default async function AccountPage() {
             <p className="mt-5 text-slate-600">{user.email}</p>
           </div>
           <form action="/auth/signout" method="post">
-            <button className="border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 hover:border-[#2563eb] hover:text-[#2563eb]">
+            <button className="rounded-md border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 hover:border-[#2563eb] hover:text-[#2563eb]">
               Sign out
             </button>
           </form>
@@ -136,7 +136,7 @@ export default async function AccountPage() {
                 </p>
                 <Link
                   href="/booking"
-                  className="mt-5 inline-flex bg-[#2563eb] px-5 py-3 text-sm font-semibold text-white"
+                  className="action-primary mt-5 inline-flex px-5 py-3 text-sm"
                 >
                   Find a time
                 </Link>

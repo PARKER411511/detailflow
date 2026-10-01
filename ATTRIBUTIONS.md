@@ -3,6 +3,7 @@
 All images in `public/images/` were generated with the built-in Codex image generation tool for this fictional studio. They are portfolio concepts, not customer work, staff photography, verified results, or before/after evidence.
 
 - `detailflow-cinematic-hero.png`: wide portrait of a deep metallic navy coupe in a premium studio, composed with negative space for the desktop hero.
+- `detailflow-hero-desktop-v3.png`: wide desktop hero composition of a deep metallic navy coupe with quiet negative space for the headline.
 - `detailflow-hero-mobile-v2.png`: portrait hero crop with the full coupe held low in frame for mobile composition.
 - `detailflow-studio-v2.png`: warm cream single-bay studio with a navy coupe for the about/story section and gallery.
 - `detailflow-handover-v2.png`: keys and care towel in the foreground with the coupe softened behind for the contact/handover section.

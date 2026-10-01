@@ -120,7 +120,7 @@ export function RescheduleForm({
     }
   }
   return (
-    <div className="mt-5 rounded-2xl border border-blue-100 bg-blue-50 p-5">
+    <div className="mt-5 rounded-md border border-blue-100 bg-blue-50 p-5">
       <p className="text-sm font-semibold text-[#0b1739]">Reschedule</p>
       <label className="mt-3 block text-xs font-semibold text-slate-600">
         New date
@@ -130,7 +130,7 @@ export function RescheduleForm({
           max={dateString(maxDate)}
           value={date}
           onChange={(event) => find(event.target.value)}
-          className="mt-2 block w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-normal"
+          className="field mt-2 font-normal"
         />
       </label>
       <p className="mt-2 text-xs text-slate-500">Times shown in {studioTimezone}.</p>
@@ -139,7 +139,7 @@ export function RescheduleForm({
           {slots.map((slot) => (
             <label
               key={slot.starts_at}
-              className={`cursor-pointer rounded-lg border px-2 py-2 text-center text-xs focus-within:ring-2 focus-within:ring-blue-300 ${selected === slot.starts_at ? "border-blue-500 bg-white text-blue-700" : "border-slate-200 bg-white text-slate-600"}`}
+              className={`cursor-pointer rounded-lg border px-2 py-2 text-center text-xs focus-within:ring-2 focus-within:ring-blue-600 ${selected === slot.starts_at ? "border-blue-500 bg-white text-blue-700" : "border-slate-200 bg-white text-slate-600"}`}
             >
               <input
                 type="radio"
@@ -165,7 +165,7 @@ export function RescheduleForm({
         type="button"
         onClick={submit}
         disabled={busy || !selected}
-        className="mt-4 rounded-full bg-[#0b1739] px-4 py-2 text-xs font-semibold text-white disabled:opacity-40"
+        className="action-primary mt-4 px-4 py-2 text-xs disabled:opacity-40"
       >
         {busy ? "Saving…" : "Save new time"}
       </button>

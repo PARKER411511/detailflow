@@ -30,7 +30,7 @@ export default async function AdminPage() {
           </p>
           <Link
             href="/account"
-            className="mt-6 inline-flex rounded-full bg-[#0b1739] px-5 py-3 text-sm font-semibold text-white"
+            className="action-primary mt-6 inline-flex px-5 py-3 text-sm"
           >
             Back to account
           </Link>

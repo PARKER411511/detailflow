@@ -55,7 +55,7 @@ export function ResetPasswordForm() {
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal"
+            className="mt-2 field"
           />
         </label>
         <label className="block text-sm font-medium text-slate-700">
@@ -66,13 +66,13 @@ export function ResetPasswordForm() {
             type="password"
             value={confirm}
             onChange={(event) => setConfirm(event.target.value)}
-            className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal"
+            className="mt-2 field"
           />
         </label>
         {message && (
           <p
             role="status"
-            className="rounded-xl bg-blue-50 p-4 text-sm leading-6 text-blue-800"
+            className="rounded-md bg-blue-50 p-4 text-sm leading-6 text-blue-800"
           >
             {message}
           </p>
@@ -80,7 +80,7 @@ export function ResetPasswordForm() {
         <button
           disabled={loading}
           type="submit"
-          className="w-full rounded-full bg-[#2563eb] px-5 py-4 text-sm font-semibold text-white hover:bg-[#1d4ed8] disabled:opacity-60"
+          className="action-primary w-full px-5 py-4"
         >
           {loading ? "Updating…" : "Update password"}
         </button>

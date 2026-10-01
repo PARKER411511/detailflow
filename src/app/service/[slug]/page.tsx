@@ -38,7 +38,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
             <h2 className="mt-4 text-4xl font-semibold tracking-[-.045em] text-[#0b1739]">A little more time for the details that matter.</h2>
             <p className="mt-6 text-base leading-7 text-slate-600">{service.details}. We’ll begin with a condition check and finish with a walkaround so you know exactly what changed.</p>
             <div className="mt-10 border-y border-slate-200 py-7"><p className="text-sm font-semibold text-[#0b1739]">Best for</p><p className="mt-3 text-base leading-7 text-slate-600">{service.bestFor}</p></div>
-            <Link href={`/booking?service=${service.slug}`} className="mt-9 inline-flex items-center bg-[#2563eb] px-6 py-4 text-sm font-semibold text-white hover:bg-[#1d4ed8]">Find an appointment <span aria-hidden className="ml-4">↗</span></Link>
+            <Link href={`/booking?service=${service.slug}`} className="mt-9 action-primary inline-flex items-center px-6 py-4 text-sm">Find an appointment <span aria-hidden className="ml-4">↗</span></Link>
           </div>
         </div>
       </section>

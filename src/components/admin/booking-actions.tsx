@@ -47,7 +47,7 @@ export function AdminBookingActions({ bookingId, status }: { bookingId: string; 
         onChange={(event) => setValue(event.target.value)}
         disabled={!options.length || busy}
         aria-label={`Status for booking ${bookingId}`}
-        className="rounded-lg border border-slate-200 px-2 py-2 text-xs capitalize"
+        className="field py-2 text-xs capitalize"
       >
         {options.map((option) => (
           <option key={option} value={option}>
@@ -59,7 +59,7 @@ export function AdminBookingActions({ bookingId, status }: { bookingId: string; 
         type="button"
         onClick={update}
         disabled={busy || value === status || !transitions[status]?.includes(value)}
-        className="rounded-lg bg-[#0b1739] px-3 py-2 text-xs font-semibold text-white disabled:opacity-40"
+        className="action-primary px-3 py-2 text-xs disabled:opacity-40"
       >
         {busy ? "…" : "Save"}
       </button>

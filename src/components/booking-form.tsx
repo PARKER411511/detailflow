@@ -243,7 +243,7 @@ export function BookingForm({
           {services.map((service) => (
             <label
               key={service.slug}
-              className={`cursor-pointer rounded-2xl border p-5 transition focus-within:ring-2 focus-within:ring-blue-300 ${serviceSlug === service.slug ? "border-blue-500 bg-blue-50 ring-2 ring-blue-100" : "border-slate-200 hover:border-blue-200"}`}
+              className={`cursor-pointer rounded-md border p-5 transition focus-within:ring-2 focus-within:ring-blue-600 ${serviceSlug === service.slug ? "border-blue-500 bg-blue-50 ring-2 ring-blue-100" : "border-slate-200 hover:border-blue-200"}`}
             >
               <input
                 type="radio"
@@ -297,7 +297,7 @@ export function BookingForm({
             max={dateString(maxDate)}
             value={date}
             onChange={(event) => loadSlots(event.target.value)}
-            className="mt-2 block w-full rounded-xl border border-slate-200 px-4 py-3"
+            className="mt-2 field"
           />
         </label>
         {date && (
@@ -317,7 +317,7 @@ export function BookingForm({
                 {slots.map((slot) => (
                   <label
                     key={slot.starts_at}
-                    className={`cursor-pointer rounded-xl border px-4 py-3 text-center text-sm font-medium focus-within:ring-2 focus-within:ring-blue-300 ${selectedSlot === slot.starts_at ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-700 hover:border-blue-300"}`}
+                    className={`cursor-pointer rounded-md border px-4 py-3 text-center text-sm font-medium focus-within:ring-2 focus-within:ring-blue-600 ${selectedSlot === slot.starts_at ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-700 hover:border-blue-300"}`}
                   >
                     <input
                       type="radio"
@@ -332,7 +332,7 @@ export function BookingForm({
                 ))}
               </div>
             ) : (
-              <p className="mt-4 rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
+              <p className="mt-4 rounded-md bg-slate-50 p-4 text-sm text-slate-500">
                 {configured ? "No openings on this date. Try another day." : "Portfolio demonstration — appointments cannot be confirmed here."}
               </p>
             )}
@@ -360,7 +360,7 @@ export function BookingForm({
               value={vehicle}
               onChange={(event) => setVehicle(event.target.value)}
               placeholder="Year, make, model"
-              className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal placeholder:text-slate-500"
+              className="mt-2 field placeholder:text-slate-500"
             />
           </label>
           <label className="text-sm font-medium text-slate-700">
@@ -371,13 +371,13 @@ export function BookingForm({
               onChange={(event) => setNotes(event.target.value)}
               rows={4}
               placeholder="Paint concerns, access notes, or anything else…"
-              className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal placeholder:text-slate-500"
+              className="mt-2 field placeholder:text-slate-500"
             />
           </label>
         </div>
       </div>
       {reviewing && (
-        <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5">
+        <div className="rounded-md border border-blue-100 bg-blue-50 p-5">
           <p className="text-xs font-bold uppercase tracking-[.18em] text-blue-600">
             Review your appointment
           </p>
@@ -418,13 +418,13 @@ export function BookingForm({
       {message && (
         <div
           role="status"
-          className={`rounded-2xl p-4 text-sm leading-6 ${message.type === "success" ? "bg-emerald-50 text-emerald-800" : "bg-rose-50 text-rose-700"}`}
+          className={`rounded-md p-4 text-sm leading-6 ${message.type === "success" ? "bg-emerald-50 text-emerald-800" : "bg-rose-50 text-rose-700"}`}
         >
           {message.text}
         </div>
       )}
       {!userEmail && (
-        <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5 text-sm leading-6 text-slate-600">
+        <div className="rounded-md border border-blue-100 bg-blue-50 p-5 text-sm leading-6 text-slate-600">
           Sign in to continue with your appointment request.{" "}
           <Link
             href={`/login?next=${encodeURIComponent("/booking?resume=1")}`}
@@ -438,7 +438,7 @@ export function BookingForm({
       <button
         type="submit"
         disabled={submitting || !selectedService}
-        className="w-full rounded-full bg-[#2563eb] px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-blue-100 transition hover:bg-[#1d4ed8] disabled:cursor-not-allowed disabled:opacity-50"
+        className="action-primary w-full px-6 py-4 disabled:cursor-not-allowed"
       >
         {submitting
           ? "Confirming…"

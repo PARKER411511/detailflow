@@ -19,11 +19,11 @@ export function SiteHeader() {
           <Link href="/login?next=/account" className="text-[14px] font-medium text-slate-600 transition-colors hover:text-[#2563eb]">Sign in</Link>
           <Link href="/booking" className="border-b-2 border-[#2563eb] pb-1 text-[14px] font-bold text-[#2563eb] transition-colors hover:border-[#0b1739] hover:text-[#0b1739]">Book a detail <span aria-hidden className="ml-2">↗</span></Link>
         </nav>
-        <button type="button" onClick={() => setOpen(!open)} className="rounded-none p-2 text-[#0b1739] lg:hidden" aria-expanded={open} aria-label={open ? "Close menu" : "Open menu"}>
+        <button type="button" onClick={() => setOpen(!open)} className="min-h-11 min-w-11 rounded-md p-2 text-[#0b1739] lg:hidden" aria-expanded={open} aria-label={open ? "Close menu" : "Open menu"}>
           {open ? <span className="block text-2xl leading-none" aria-hidden>×</span> : <><span className="block h-px w-6 bg-current" /><span className="my-1.5 block h-px w-6 bg-current" /><span className="block h-px w-6 bg-current" /></>}
         </button>
       </div>
-      {open && <nav className="border-t border-slate-200 bg-[#fffdfa] px-5 pb-7 pt-2 lg:hidden" aria-label="Mobile navigation">{nav.map(([label, href]) => <Link key={href} href={href} onClick={() => setOpen(false)} className="block border-b border-slate-200 py-4 text-[15px] font-medium text-slate-700">{label}</Link>)}<Link href="/login?next=/account" onClick={() => setOpen(false)} className="block border-b border-slate-200 py-4 text-[15px] font-medium text-slate-700">Sign in</Link><Link href="/booking" onClick={() => setOpen(false)} className="mt-5 inline-flex w-full items-center justify-between bg-[#2563eb] px-4 py-3 text-[14px] font-bold text-white">Book a detail <span aria-hidden>↗</span></Link></nav>}
+      {open && <nav className="border-t border-slate-200 bg-[#fffdfa] px-5 pb-7 pt-2 lg:hidden" aria-label="Mobile navigation">{nav.map(([label, href]) => <Link key={href} href={href} onClick={() => setOpen(false)} className="block border-b border-slate-200 py-4 text-[15px] font-medium text-slate-700">{label}</Link>)}<Link href="/login?next=/account" onClick={() => setOpen(false)} className="block border-b border-slate-200 py-4 text-[15px] font-medium text-slate-700">Sign in</Link><Link href="/booking" onClick={() => setOpen(false)} className="mt-5 inline-flex w-full items-center justify-between bg-[#173e8d] px-4 py-3 text-[14px] font-bold text-white hover:bg-[#12336f]">Book a detail <span aria-hidden>↗</span></Link></nav>}
     </header>
   );
 }

@@ -4,6 +4,8 @@
   --navy: #0b1739;
   --blue: #2563eb;
   --blue-dark: #1d4ed8;
+  --action: #173e8d;
+  --action-hover: #12336f;
   --pale: #eff6ff;
   --slate: #0f172a;
   --muted: #64748b;
@@ -26,7 +28,7 @@ a, button, input, select, textarea { outline-offset: 4px; }
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #2563eb; outline-offset: 4px; }
 ::selection { background: #bfdbfe; color: var(--navy); }
 .text-balance { text-wrap: balance; }
-.editorial-kicker { font-size: .68rem; font-weight: 700; letter-spacing: .2em; line-height: 1.2; text-transform: uppercase; }
+.editorial-kicker { font-size: .75rem; font-weight: 700; letter-spacing: .16em; line-height: 1.4; text-transform: uppercase; }
 .display { letter-spacing: -.045em; line-height: .94; }
 .hairline { border-color: rgba(15, 23, 42, .14); }
 .image-frame { position: relative; overflow: hidden; background: #dce5f0; }
@@ -34,6 +36,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .image-frame:hover img { transform: scale(1.035); }
 .before-after { aspect-ratio: 16 / 10; }
 .before-after input:focus-visible + span { outline: 2px solid #fff; outline-offset: -3px; }
+.action-primary { display: inline-flex; align-items: center; justify-content: center; border-radius: .375rem; background: var(--action); padding: .75rem 1.25rem; color: white; font-size: .875rem; font-weight: 600; transition: background-color .2s ease, opacity .2s ease; }
+.action-primary:hover { background: var(--action-hover); }
+.action-primary:disabled { cursor: not-allowed; opacity: .5; }
+.field { width: 100%; border: 1px solid #cbd5e1; border-radius: .375rem; background: white; padding: .75rem 1rem; font-weight: 400; }
+.field:focus { border-color: var(--blue); outline: 2px solid rgba(37, 99, 235, .18); outline-offset: 1px; }
 .noise { background-image: radial-gradient(rgba(255,255,255,.12) 1px, transparent 1px); background-size: 12px 12px; }
 .hero-grid { background-image: linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px); background-size: 56px 56px; }
 @media (max-width: 640px) { .display { letter-spacing: -.035em; } }

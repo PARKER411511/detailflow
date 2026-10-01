@@ -46,7 +46,7 @@ export function ProfileForm({
             required
             value={name}
             onChange={(event) => setName(event.target.value)}
-            className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal"
+            className="mt-2 field"
           />
         </label>
         <label className="text-sm font-medium text-slate-700">
@@ -54,7 +54,7 @@ export function ProfileForm({
           <input
             value={phone}
             onChange={(event) => setPhone(event.target.value)}
-            className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal"
+            className="mt-2 field"
           />
         </label>
       </div>
@@ -65,7 +65,7 @@ export function ProfileForm({
       )}
       <button
         disabled={busy}
-        className="mt-5 rounded-full bg-[#0b1739] px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
+        className="action-primary mt-5 px-5 py-3 disabled:opacity-50"
       >
         {busy ? "Saving…" : "Save profile"}
       </button>
