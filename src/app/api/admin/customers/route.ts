@@ -1,0 +1,4 @@
+import { NextResponse } from "next/server";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+async function getAdmin() { const supabase = await createClient(); const { data: { user } } = await supabase.auth.getUser(); if (!user) return { supabase, allowed: false }; const { data: allowed } = await supabase.rpc("is_admin"); return { supabase, allowed: allowed === true }; }
+export async function GET() { if (!isSupabaseConfigured()) return NextResponse.json({ error: "Supabase is not configured." }, { status: 503 }); const { supabase, allowed } = await getAdmin(); if (!allowed) return NextResponse.json({ error: "Admin access required." }, { status: 403 }); const { data, error } = await supabase.rpc("admin_list_customers"); if (error) return NextResponse.json({ error: "Unable to load customers." }, { status: 503 }); return NextResponse.json({ customers: data ?? [] }, { headers: { "Cache-Control": "private, no-store" } }); }
