@@ -35,7 +35,7 @@ export default async function ServicesPage() {
               <p className="editorial-kicker text-[#2563eb]">The menu</p>
               <h2 className="mt-3 text-3xl font-semibold tracking-[-.05em] text-[#0b1739] sm:text-5xl">Choose your level of attention.</h2>
             </div>
-            <p className="max-w-xs text-sm leading-6 text-slate-600">Live services and pricing come from the studio database when configured. Preview records are clearly marked.</p>
+            <p className="max-w-xs text-sm leading-6 text-slate-600">Service scope and pricing are shown for this portfolio studio. A configured calendar is required to request an appointment.</p>
           </div>
           {serviceRecords.length ? (
             <div className="grid gap-x-7 gap-y-14 lg:grid-cols-3">
@@ -45,7 +45,7 @@ export default async function ServicesPage() {
             </div>
           ) : (
             <div className="border border-blue-200 bg-blue-50 p-7 text-sm leading-6 text-slate-700">
-              No active service records are available yet. Connect the configured Supabase project and add a service from the protected admin workspace.
+              The preview menu is waiting for its studio records. Appointments cannot be confirmed here.
             </div>
           )}
           <div className="mt-24 grid gap-10 border-t border-slate-200 pt-10 md:grid-cols-3">

@@ -26,11 +26,10 @@ export default async function AccountPage() {
         <div className="mx-auto max-w-3xl border-t border-blue-300 pt-8">
           <p className="editorial-kicker text-[#2563eb]">Preview mode</p>
           <h1 className="display mt-5 text-6xl font-semibold text-[#0b1739]">
-            Account setup is waiting.
+            Your account is ready when the studio is.
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
-            Connect Supabase with the variables in `.env.local` to enable
-            sign-in, booking history, and account management.
+            This portfolio demonstration does not confirm appointments or maintain live account history.
           </p>
           <Link
             href="/booking"
@@ -114,7 +113,7 @@ export default async function AccountPage() {
             </div>
             {error ? (
               <p className="mt-8 border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-                We could not load your appointments. Check the database setup.
+                We could not load your appointments right now. Please try again.
               </p>
             ) : bookings?.length ? (
               <div className="mt-8 space-y-12">

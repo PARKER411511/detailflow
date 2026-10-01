@@ -1,4 +1,4 @@
-import { services as previewServices, type Service } from "@/data/services";
+import { services as previewServices, type Service, getServicePresentation } from "@/data/services";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 
 const accents: Record<string, string> = {
@@ -31,6 +31,7 @@ export async function getPublicServices(): Promise<Service[]> {
     duration: durationLabel(service.duration_minutes),
     price: service.price_cents / 100,
     accent: accents[service.slug] ?? "#93c5fd",
+    ...(getServicePresentation(service.slug) ?? { bestFor: "A focused studio visit shaped around the car in front of us.", inclusions: service.details.split(" · ").slice(0, 3), stages: ["Condition walkaround", "Careful studio work", "Clear handover"], outcome: "A more considered finish with the work explained at handover.", care: "Follow the care note shared by the studio after your visit." }),
   }));
 }
 export async function getPublicService(slug: string) {

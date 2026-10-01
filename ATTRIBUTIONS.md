@@ -1,11 +1,17 @@
 # DetailFlow image attributions
 
-The following portfolio concept images in `public/images/` were generated with the built-in Codex image generation tool for this fictional studio. They are not customer work, staff photography, verified results, or before/after evidence:
+All images in `public/images/` were generated with the built-in Codex image generation tool for this fictional studio. They are portfolio concepts, not customer work, staff photography, verified results, or before/after evidence.
 
-- `detailflow-cinematic-hero.png`: photorealistic wide studio portrait of an unbranded metallic-blue coupe, deep navy negative space, warm silver highlights, and the car held toward the right side of frame for editorial headline space.
-- `detailflow-paint-detail.png`: dramatic close-up of water beads on a navy hood and fender in controlled studio light.
+- `detailflow-cinematic-hero.png`: wide portrait of a deep metallic navy coupe in a premium studio, composed with negative space for the desktop hero.
+- `detailflow-hero-mobile-v2.png`: portrait hero crop with the full coupe held low in frame for mobile composition.
+- `detailflow-studio-v2.png`: warm cream single-bay studio with a navy coupe for the about/story section and gallery.
+- `detailflow-handover-v2.png`: keys and care towel in the foreground with the coupe softened behind for the contact/handover section.
+- `detailflow-paint-detail.png`: water beads on a navy hood and fender for exterior care.
+- `detailflow-polishing.png`: gloved hands using a machine polisher on a navy hood for paint correction.
 - `detailflow-interior.png`: warm taupe and espresso leather cabin detail with no logos or people.
-- `detailflow-polishing.png`: gloved hands using a machine polisher on a navy hood with clear bright reflections.
-- `detailflow-hero.png` and `detailflow-before.png`: an earlier matching coupe concept pair; the latter is an edited dusty-road-grime version of the same composition for the interactive illustrative comparison.
+- `detailflow-wheel-v2.png`: brushed silver wheel and navy panel material study for the gallery.
+- `detailflow-materials-v2.png`: taupe stitched and perforated leather material study for the gallery.
+- `detailflow-surface-before-v2.png` and `detailflow-surface-after-v2.png`: aligned fine-wash-mark and cleared-paint comparison pair for the interactive illustrative slider.
+- `detailflow-hero.png` and `detailflow-before.png`: an earlier matching coupe concept pair retained as fallback/reference assets; the latter is an edited dusty-road-grime version.
 
-The remaining moodboard gallery images are illustrative stock photography from Unsplash. They are used for visual direction only and do not depict DetailFlow customers, staff, or verified results. Image URLs are retained in the gallery source for direct attribution and reproducibility.
+No supplied competitor or reference imagery was copied. The UI labels the comparison and portfolio images as illustrative concepts.

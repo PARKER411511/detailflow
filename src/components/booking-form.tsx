@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Service } from "@/data/services";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatTimeZoneLabel } from "@/lib/format";
 
 type Slot = { starts_at: string; ends_at: string; label: string };
 export function BookingForm({
@@ -12,12 +12,14 @@ export function BookingForm({
   userEmail,
   studioTimezone,
   bookingHorizonDays,
+  configured = true,
 }: {
   services: Service[];
   initialService?: string;
   userEmail?: string | null;
   studioTimezone: string;
   bookingHorizonDays: number;
+  configured?: boolean;
 }) {
   const router = useRouter();
   const [serviceSlug, setServiceSlug] = useState(
@@ -75,12 +77,12 @@ export function BookingForm({
       const body = await response.json();
       if (requestId !== availabilityRequest.current) return;
       if (!response.ok)
-        throw new Error(body.error ?? "Availability is unavailable.");
+        throw new Error(body.error ?? "Availability could not be loaded.");
       setSlots(body.slots ?? []);
       if (!body.slots?.length)
         setMessage({
           type: "error",
-          text: "There are no bookable openings on this date. Try another day.",
+          text: "No openings on this date. Try another day.",
         });
     } catch (error) {
       if (requestId !== availabilityRequest.current) return;
@@ -89,7 +91,7 @@ export function BookingForm({
         text:
           error instanceof Error
             ? error.message
-            : "Availability is unavailable.",
+            : "Availability could not be loaded.",
       });
     } finally {
       if (requestId === availabilityRequest.current) setLoadingSlots(false);
@@ -130,7 +132,7 @@ export function BookingForm({
           .then(async (response) => ({ response, body: await response.json() }))
           .then(({ response, body }) => {
             if (requestId !== availabilityRequest.current) return;
-            if (!response.ok) throw new Error(body.error ?? "Availability is unavailable.");
+            if (!response.ok) throw new Error(body.error ?? "Availability could not be loaded.");
             setSlots(body.slots ?? []);
             if (draft.selectedSlot && (body.slots ?? []).some((slot: Slot) => slot.starts_at === draft.selectedSlot)) {
               setSelectedSlot(draft.selectedSlot);
@@ -140,7 +142,7 @@ export function BookingForm({
           })
           .catch((error: unknown) => {
             if (requestId !== availabilityRequest.current) return;
-            setMessage({ type: "error", text: error instanceof Error ? error.message : "Availability is unavailable." });
+            setMessage({ type: "error", text: error instanceof Error ? error.message : "Availability could not be loaded." });
           })
           .finally(() => {
             if (requestId === availabilityRequest.current) setLoadingSlots(false);
@@ -303,12 +305,12 @@ export function BookingForm({
             <p className="text-sm font-medium text-slate-700">
               Available start times{" "}
               <span className="font-normal text-slate-500">
-                · Studio time zone: {studioTimezone}
+                · {formatTimeZoneLabel(studioTimezone)}
               </span>
             </p>
             {loadingSlots ? (
               <p className="mt-4 text-sm text-slate-500">
-                Checking the live calendar…
+                {configured ? "Checking studio availability…" : "Checking availability…"}
               </p>
             ) : slots.length ? (
               <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -331,7 +333,7 @@ export function BookingForm({
               </div>
             ) : (
               <p className="mt-4 rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
-                Live availability appears here after Supabase is connected.
+                {configured ? "No openings on this date. Try another day." : "Portfolio demonstration — appointments cannot be confirmed here."}
               </p>
             )}
           </div>
@@ -423,13 +425,13 @@ export function BookingForm({
       )}
       {!userEmail && (
         <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5 text-sm leading-6 text-slate-600">
-          You’ll need a DetailFlow account to confirm a time.{" "}
+          Sign in to continue with your appointment request.{" "}
           <Link
             href={`/login?next=${encodeURIComponent("/booking?resume=1")}`}
             onClick={saveDraft}
             className="font-semibold text-blue-700 hover:text-blue-900"
           >
-            Sign in or create one ↗
+            Sign in or create an account ↗
           </Link>
         </div>
       )}
@@ -450,4 +452,3 @@ export function BookingForm({
     </form>
   );
 }
-

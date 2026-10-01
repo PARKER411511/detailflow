@@ -42,7 +42,7 @@ function rpcFailure(error: { code?: string; message?: string }, fallback: string
 }
 
 export async function POST(request: Request) {
-  if (!isSupabaseConfigured()) return NextResponse.json({ error: "Booking is unavailable until Supabase is configured." }, { status: 503 });
+  if (!isSupabaseConfigured()) return NextResponse.json({ error: "Portfolio demonstration — appointments cannot be confirmed here." }, { status: 503 });
   const { supabase, user } = await getAuthedClient();
   if (!user) return NextResponse.json({ error: "Sign in to confirm an appointment." }, { status: 401 });
   let body: unknown;
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  if (!isSupabaseConfigured()) return NextResponse.json({ error: "Booking is unavailable until Supabase is configured." }, { status: 503 });
+  if (!isSupabaseConfigured()) return NextResponse.json({ error: "Portfolio demonstration — appointments cannot be confirmed here." }, { status: 503 });
   const { supabase, user } = await getAuthedClient();
   if (!user) return NextResponse.json({ error: "Sign in to manage appointments." }, { status: 401 });
   let body: unknown;

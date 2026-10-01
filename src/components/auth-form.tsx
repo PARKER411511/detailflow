@@ -22,9 +22,9 @@ export function AuthForm() {
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage(null);
-    if (!isConfigured()) { setMessage("Supabase is not configured for this preview. Add the variables in .env.local to enable accounts."); return; }
+    if (!isConfigured()) { setMessage("Portfolio demonstration — accounts cannot be confirmed here."); return; }
     setLoading(true);
-    try { const supabase = createClient(); const result = mode === "signin" ? await supabase.auth.signInWithPassword({ email, password }) : await supabase.auth.signUp({ email, password, options: { data: { full_name: name }, emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` } }); if (result.error) { setMessage(result.error.message); return; } if (mode === "signup" && !result.data.session) setMessage("Check your email to confirm your account, then come back here to sign in."); else router.push(next); } catch { setMessage("We could not reach Supabase. Check your project URL and network connection."); } finally { setLoading(false); }
+    try { const supabase = createClient(); const result = mode === "signin" ? await supabase.auth.signInWithPassword({ email, password }) : await supabase.auth.signUp({ email, password, options: { data: { full_name: name }, emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` } }); if (result.error) { setMessage(result.error.message); return; } if (mode === "signup" && !result.data.session) setMessage("Check your email to confirm your account, then come back here to sign in."); else router.push(next); } catch { setMessage("We could not complete that account request. Please try again."); } finally { setLoading(false); }
   }
   async function resetPassword() {
     setMessage(null);
@@ -32,9 +32,9 @@ export function AuthForm() {
       setMessage("Enter your email first.");
       return;
     }
-    if (!isConfigured()) { setMessage("Supabase is not configured for this preview."); return; }
+    if (!isConfigured()) { setMessage("Portfolio demonstration — accounts cannot be confirmed here."); return; }
     setLoading(true);
-    try { const supabase = createClient(); const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/callback?next=/account/reset` }); setMessage(error ? error.message : "If an account exists for that email, you’ll receive a reset link shortly."); } catch { setMessage("We could not reach Supabase. Check your project configuration."); } finally { setLoading(false); }
+    try { const supabase = createClient(); const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/callback?next=/account/reset` }); setMessage(error ? error.message : "If an account exists for that email, you’ll receive a reset link shortly."); } catch { setMessage("We could not complete that password request. Please try again."); } finally { setLoading(false); }
   }
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm sm:p-9">
@@ -127,4 +127,3 @@ export function AuthForm() {
     </div>
   );
 }
-

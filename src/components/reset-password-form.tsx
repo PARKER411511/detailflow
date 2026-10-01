@@ -12,7 +12,7 @@ export function ResetPasswordForm() {
     event.preventDefault();
     setMessage(null);
     if (!isConfigured()) {
-      setMessage("Supabase is not configured for this preview.");
+      setMessage("Portfolio demonstration — accounts cannot be confirmed here.");
       return;
     }
     if (password.length < 8 || password !== confirm) {
