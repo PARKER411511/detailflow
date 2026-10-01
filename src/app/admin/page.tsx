@@ -67,7 +67,7 @@ export default async function AdminPage() {
     .maybeSingle();
   const studioTimezone = settings?.timezone ?? "America/New_York";
   return (
-    <section className="bg-[#f8fafc] px-5 py-16 sm:px-8">
+    <section className="bg-[#fffdfa] px-5 py-16 sm:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
@@ -86,7 +86,7 @@ export default async function AdminPage() {
           </span>
         </div>
         <div className="mt-12 grid gap-5 md:grid-cols-3">
-          <div className="rounded-3xl bg-[#0b1739] p-6 text-white">
+          <div className="border-t-2 border-blue-300 bg-[#0b1739] p-6 text-white">
             <p className="text-xs uppercase tracking-[.18em] text-blue-200">
               All bookings
             </p>
@@ -97,7 +97,7 @@ export default async function AdminPage() {
               {overviewError ? "Count unavailable" : "From the live database"}
             </p>
           </div>
-          <div className="rounded-3xl bg-white p-6 shadow-sm">
+          <div className="border-t border-slate-300 bg-white p-6">
             <p className="text-xs uppercase tracking-[.18em] text-blue-600">
               Active services
             </p>
@@ -108,7 +108,7 @@ export default async function AdminPage() {
               {overviewError ? "Count unavailable" : "Public menu items"}
             </p>
           </div>
-          <div className="rounded-3xl bg-white p-6 shadow-sm">
+          <div className="border-t border-slate-300 bg-white p-6">
             <p className="text-xs uppercase tracking-[.18em] text-blue-600">
               Calendar
             </p>
@@ -118,7 +118,7 @@ export default async function AdminPage() {
             </p>
           </div>
         </div>
-        <div className="mt-10 rounded-3xl bg-white p-6 shadow-sm sm:p-8">
+        <div className="mt-10 border-t border-slate-300 bg-white p-6 sm:p-8">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold text-[#0b1739]">Bookings</h2>
             <p className="text-sm text-slate-500">
@@ -182,7 +182,7 @@ export default async function AdminPage() {
             </p>
           )}
         </div>
-        <div className="mt-8 rounded-3xl bg-white p-6 shadow-sm sm:p-8">
+        <div className="mt-8 border-t border-slate-300 bg-white p-6 sm:p-8">
           <h2 className="text-2xl font-semibold text-[#0b1739]">Services</h2>
           <p className="mt-2 text-sm text-slate-500">
             Manage these records through the protected admin RPCs documented in
@@ -192,7 +192,7 @@ export default async function AdminPage() {
             {services?.map((service) => (
               <div
                 key={service.id}
-                className="rounded-2xl border border-slate-200 p-4"
+                className="border-t border-slate-200 p-4"
               >
                 <div className="flex items-center justify-between">
                   <p className="font-semibold text-[#0b1739]">{service.name}</p>

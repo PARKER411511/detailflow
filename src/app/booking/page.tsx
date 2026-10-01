@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { BookingForm } from "@/components/booking-form";
 import { getPublicServices } from "@/lib/public-services";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getStudioSettings } from "@/lib/studio-settings";
+
 export const metadata: Metadata = { title: "Book a detail" };
-export default async function BookingPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ service?: string }>;
-}) {
+
+export default async function BookingPage({ searchParams }: { searchParams: Promise<{ service?: string }> }) {
   const params = await searchParams;
   const services = await getPublicServices();
   const studioSettings = await getStudioSettings();
@@ -20,73 +19,8 @@ export default async function BookingPage({
   }
   return (
     <>
-      <section className="bg-[#0b1739] px-5 py-20 text-white sm:px-8">
-        <div className="mx-auto max-w-7xl">
-          <p className="text-xs font-bold uppercase tracking-[.2em] text-blue-300">
-            Book a detail
-          </p>
-          <h1 className="mt-5 max-w-3xl text-5xl font-semibold tracking-[-.05em] sm:text-7xl">
-            Make time for
-            <br />
-            <span className="text-blue-300">the good stuff.</span>
-          </h1>
-          <p className="mt-7 max-w-xl text-lg leading-8 text-blue-100/75">
-            Choose a service, find a real opening, and we’ll take care of the
-            rest.
-          </p>
-        </div>
-      </section>
-      <section className="bg-[#f8fafc] px-5 py-16 sm:px-8">
-        <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[minmax(0,720px)_300px] lg:items-start">
-          <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-10">
-            {services.length ? (
-              <BookingForm
-                services={services}
-                initialService={params.service}
-                userEmail={email}
-                studioTimezone={studioSettings.timezone}
-                bookingHorizonDays={studioSettings.bookingHorizonDays}
-              />
-            ) : (
-              <div className="rounded-2xl border border-blue-100 bg-blue-50 p-6 text-sm leading-6 text-slate-600">
-                Live service records are not available yet. Connect Supabase and
-                add active services before booking.
-              </div>
-            )}
-          </div>
-          <aside className="space-y-5">
-            <div className="rounded-3xl border border-slate-200 bg-white p-6">
-              <p className="text-xs font-bold uppercase tracking-[.18em] text-blue-600">
-                Your visit
-              </p>
-              <ul className="mt-5 space-y-4 text-sm leading-6 text-slate-600">
-                <li className="flex gap-3">
-                  <span className="text-blue-500">✓</span> One-bay studio, one
-                  car at a time
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-blue-500">✓</span> Confirmation
-                  reference after booking
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-blue-500">✓</span> Cancel or reschedule
-                  up to 24 hours before
-                </li>
-              </ul>
-            </div>
-            <div className="rounded-3xl bg-[#eff6ff] p-6">
-              <p className="text-sm font-semibold text-[#0b1739]">
-                Booking preview
-              </p>
-              <p className="mt-3 text-sm leading-6 text-slate-600">
-                The calendar and confirmation are powered by Supabase. This
-                preview shows the full flow while waiting for project
-                credentials.
-              </p>
-            </div>
-          </aside>
-        </div>
-      </section>
+      <section className="bg-[#0b1739] px-5 py-20 text-white sm:px-8 lg:py-28"><div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_.8fr] lg:items-end"><div><p className="editorial-kicker text-blue-300">Book a detail / live calendar</p><h1 className="display mt-6 max-w-4xl text-6xl font-semibold sm:text-8xl">Make time for the good stuff.</h1></div><div className="border-l border-white/20 pl-6"><p className="max-w-md text-lg leading-8 text-blue-100/75">Choose a service, find a real opening, and we’ll take care of the rest.</p><p className="mt-6 text-xs font-semibold uppercase tracking-[.14em] text-white/55">Studio time · {studioSettings.timezone}</p></div></div></section>
+      <section className="px-5 py-16 sm:px-8 lg:py-24"><div className="mx-auto grid max-w-7xl gap-14 lg:grid-cols-[minmax(0,720px)_300px] lg:items-start"><div className="border-t border-slate-300 pt-8 sm:pt-10">{services.length ? <BookingForm services={services} initialService={params.service} userEmail={email} studioTimezone={studioSettings.timezone} bookingHorizonDays={studioSettings.bookingHorizonDays} /> : <div className="border border-blue-200 bg-blue-50 p-6 text-sm leading-6 text-slate-700">Live service records are not available yet. Connect Supabase and add active services before booking.</div>}</div><aside className="space-y-10 lg:pt-2"><div><p className="editorial-kicker text-[#2563eb]">Your visit</p><ul className="mt-5 divide-y divide-slate-200 border-y border-slate-200 text-sm leading-6 text-slate-600"><li className="py-4"><span className="mr-3 text-[#2563eb]">01</span>One-bay studio, one car at a time</li><li className="py-4"><span className="mr-3 text-[#2563eb]">02</span>Confirmation reference after booking</li><li className="py-4"><span className="mr-3 text-[#2563eb]">03</span>Cancel or reschedule up to 24 hours before</li></ul></div><div className="image-frame aspect-[4/3]"><Image src="/images/detailflow-polishing.png" alt="AI-generated illustrative image of polishing work" fill sizes="(max-width: 1024px) 100vw, 300px" className="object-cover" /><p className="absolute bottom-3 left-3 bg-[#fffdfa]/90 px-2 py-1 text-[10px] font-bold uppercase tracking-[.14em] text-[#0b1739]">AI-generated concept</p></div><p className="text-xs leading-6 text-slate-500">The calendar and confirmation are powered by Supabase. If this preview is not configured, it will explain the setup needed instead of fabricating availability.</p></aside></div></section>
     </>
   );
 }
