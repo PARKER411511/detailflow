@@ -2,7 +2,13 @@
 
 All images in `public/images/` were generated with the built-in Codex image generation tool for this fictional studio. They are portfolio concepts, not customer work, staff photography, verified results, or before/after evidence.
 
+The motorsport pair used the prompt direction “original unbranded silver performance coupe, dark graphite studio, cobalt architectural light, sharp editorial automotive photography” with separate landscape hero and vertical fender/wheel material-study compositions.
+
+Typography is bundled locally for deterministic previews: `src/fonts/Geist-wght.woff2` from [Vercel Geist](https://github.com/vercel/geist-font), and `src/fonts/BarlowCondensed-SemiBold.ttf` / `src/fonts/BarlowCondensed-Bold.ttf` from [Google Fonts Barlow Condensed](https://github.com/google/fonts/tree/main/ofl/barlowcondensed). The corresponding OFL license files are committed beside the fonts.
+
 - `detailflow-cinematic-hero.png`: wide portrait of a deep metallic navy coupe in a premium studio, composed with negative space for the desktop hero.
+- `detailflow-motorsport-hero-v1.png`: landscape silver performance coupe in a graphite studio with cobalt architectural light, generated for the motorsport editorial homepage hero.
+- `detailflow-motorsport-auth-v1.png`: vertical silver coupe fender and forged wheel material study on a graphite backdrop with cobalt reflection, generated for the focused account screen.
 - `detailflow-hero-desktop-v3.png`: wide desktop hero composition of a deep metallic navy coupe with quiet negative space for the headline.
 - `detailflow-hero-mobile-v2.png`: portrait hero crop with the full coupe held low in frame for mobile composition.
 - `detailflow-studio-v2.png`: warm cream single-bay studio with a navy coupe for the about/story section and gallery.

@@ -8,22 +8,30 @@ const nav = [["Services", "/services"], ["Gallery", "/gallery"], ["Our approach"
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-[#fffdfa]/95 backdrop-blur-xl">
-      <div className="mx-auto flex h-[76px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
+    <header className="sticky top-0 z-50 border-b border-slate-200/90 bg-[color:var(--surface)]/95 backdrop-blur-xl">
+      <div className="mx-auto flex h-[72px] max-w-[1500px] items-center justify-between px-5 sm:px-8 lg:px-10">
         <Link href="/" onClick={() => setOpen(false)} aria-label="DetailFlow home" className="group flex items-center gap-3">
-          <span className="relative flex h-9 w-9 items-center justify-center border border-[#0b1739] text-[11px] font-bold tracking-[-.08em] text-[#0b1739] before:absolute before:bottom-1.5 before:left-1.5 before:h-px before:w-4 before:bg-[#2563eb]">DF</span>
-          <span><span className="block text-[14px] font-bold tracking-[.24em] text-[#0b1739]">DETAILFLOW</span><span className="mt-0.5 block text-[9px] font-medium uppercase tracking-[.17em] text-slate-500">Automotive studio</span></span>
+          <svg aria-hidden="true" viewBox="0 0 38 38" className="h-9 w-9 text-[var(--ink)]" fill="none">
+            <path d="M4 7h18l12 12-12 12H4l11-12L4 7Z" stroke="currentColor" strokeWidth="2" />
+            <path d="M4 19h18M19 7v24" stroke="var(--blue)" strokeWidth="2" />
+          </svg>
+          <span><span className="block text-[13px] font-bold tracking-[.24em] text-[var(--ink)]">DETAILFLOW</span><span className="mt-0.5 block text-[9px] font-medium uppercase tracking-[.18em] text-slate-500">Automotive studio</span></span>
         </Link>
-        <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary navigation">
-          {nav.map(([label, href]) => <Link key={href} href={href} className="text-[14px] font-medium text-slate-600 transition-colors hover:text-[#2563eb]">{label}</Link>)}
-          <Link href="/login?next=/account" className="text-[14px] font-medium text-slate-600 transition-colors hover:text-[#2563eb]">Sign in</Link>
-          <Link href="/booking" className="border-b-2 border-[#2563eb] pb-1 text-[14px] font-bold text-[#2563eb] transition-colors hover:border-[#0b1739] hover:text-[#0b1739]">Book a detail <span aria-hidden className="ml-2">↗</span></Link>
+        <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary navigation">
+          {nav.map(([label, href]) => <Link key={href} href={href} className="text-[14px] font-semibold text-slate-600 transition-colors hover:text-[var(--blue)]">{label}</Link>)}
+          <Link href="/login?next=/account" className="border-l border-slate-300 pl-7 text-[14px] font-semibold text-slate-600 transition-colors hover:text-[var(--blue)]">Sign in</Link>
+          <Link href="/booking" className="action-primary px-4 py-2.5 text-[14px]">Book a detail <span aria-hidden className="ml-2">↗</span></Link>
         </nav>
-        <button type="button" onClick={() => setOpen(!open)} className="min-h-11 min-w-11 rounded-md p-2 text-[#0b1739] lg:hidden" aria-expanded={open} aria-label={open ? "Close menu" : "Open menu"}>
+        <button type="button" onClick={() => setOpen(!open)} className="min-h-11 min-w-11 rounded-md border border-slate-300 p-2 text-[var(--ink)] lg:hidden" aria-expanded={open} aria-controls="mobile-navigation" aria-label={open ? "Close menu" : "Open menu"}>
           {open ? <span className="block text-2xl leading-none" aria-hidden>×</span> : <><span className="block h-px w-6 bg-current" /><span className="my-1.5 block h-px w-6 bg-current" /><span className="block h-px w-6 bg-current" /></>}
         </button>
       </div>
-      {open && <nav className="border-t border-slate-200 bg-[#fffdfa] px-5 pb-7 pt-2 lg:hidden" aria-label="Mobile navigation">{nav.map(([label, href]) => <Link key={href} href={href} onClick={() => setOpen(false)} className="block border-b border-slate-200 py-4 text-[15px] font-medium text-slate-700">{label}</Link>)}<Link href="/login?next=/account" onClick={() => setOpen(false)} className="block border-b border-slate-200 py-4 text-[15px] font-medium text-slate-700">Sign in</Link><Link href="/booking" onClick={() => setOpen(false)} className="mt-5 inline-flex w-full items-center justify-between bg-[#173e8d] px-4 py-3 text-[14px] font-bold text-white hover:bg-[#12336f]">Book a detail <span aria-hidden>↗</span></Link></nav>}
+      {open && <nav id="mobile-navigation" className="border-t border-slate-200 bg-[var(--surface)] px-5 pb-7 pt-2 shadow-xl lg:hidden" aria-label="Mobile navigation">
+        <div className="mb-4 border-b border-slate-300 py-3"><span className="tech-label text-slate-500">Navigation / 01</span></div>
+        {nav.map(([label, href]) => <Link key={href} href={href} onClick={() => setOpen(false)} className="block border-b border-slate-200 py-4 text-[16px] font-semibold text-[var(--ink)]">{label}</Link>)}
+        <Link href="/login?next=/account" onClick={() => setOpen(false)} className="block border-b border-slate-200 py-4 text-[16px] font-semibold text-[var(--ink)]">Sign in</Link>
+        <Link href="/booking" onClick={() => setOpen(false)} className="action-primary mt-5 flex w-full items-center justify-between px-4 py-3.5 text-[15px]">Book a detail <span aria-hidden>↗</span></Link>
+      </nav>}
     </header>
   );
 }

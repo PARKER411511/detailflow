@@ -1,6 +1,6 @@
 # DetailFlow
 
-DetailFlow is a fictional one-bay auto detailing studio built with Next.js App Router, TypeScript, Tailwind CSS, and Supabase Auth/Postgres. The public site is usable in preview mode with clearly labeled static service copy and illustrative imagery. Booking availability, authentication, persistence, customer accounts, and admin data require Supabase configuration.
+DetailFlow is a fictional one-bay auto detailing studio built with Next.js App Router, TypeScript, Tailwind CSS, and Supabase Auth/Postgres. The public site uses a motorsport editorial direction: sharper grids, technical labels, cobalt accents, and a silver coupe studio hero. It remains usable in preview mode with clearly labeled static service copy and illustrative imagery. Booking availability, authentication, persistence, customer accounts, and admin data require Supabase configuration.
 
 ## Run locally
 
