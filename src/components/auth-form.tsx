@@ -108,9 +108,13 @@ export function AuthForm() {
 
   return (
     <div className="auth-form-content" data-auth-mode={mode}>
+      <div className="auth-mode-tabs" role="group" aria-label="Account mode">
+        <button type="button" aria-pressed={isSignIn} onClick={() => switchMode("signin")}>Sign in</button>
+        <button type="button" aria-pressed={!isSignIn} onClick={() => switchMode("signup")}>Create an account</button>
+      </div>
       <h1 className="auth-title">{isSignIn ? "Welcome back" : "Create your account"}</h1>
       <p className="auth-intro">
-        {isSignIn ? "Sign in to manage your appointments and vehicle notes." : "Create an account to keep your appointments and vehicle notes together."}
+        {isSignIn ? "Sign in to manage appointments, vehicle notes, and your next visit." : "Create an account to keep appointments and vehicle notes together."}
       </p>
       <form onSubmit={submit} className="auth-form" aria-describedby={message ? "auth-status" : undefined}>
         {mode === "signup" && (
@@ -148,6 +152,7 @@ export function AuthForm() {
                 minLength={8}
                 type={showPassword ? "text" : "password"}
                 autoComplete={isSignIn ? "current-password" : "new-password"}
+                aria-describedby={!isSignIn ? "auth-password-hint" : undefined}
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 className="auth-field"
@@ -163,6 +168,7 @@ export function AuthForm() {
               </button>
             </span>
           </div>
+          {!isSignIn && <p id="auth-password-hint" className="auth-password-hint">At least 8 characters.</p>}
           {isSignIn && (
             <button type="button" onClick={resetPassword} disabled={loading} className="auth-recovery">
               Forgot password?
@@ -180,12 +186,11 @@ export function AuthForm() {
           {message}
         </p>
       )}
-      <p className="auth-mode-switch">
-        {isSignIn ? "New to DetailFlow?" : "Already have an account?"}{" "}
-        <button type="button" onClick={() => switchMode(isSignIn ? "signup" : "signin")}>
-          {isSignIn ? "Create an account" : "Sign in"}
-        </button>
-      </p>
+      <div className="auth-benefits" aria-label="Account features">
+        <span><svg aria-hidden="true" viewBox="0 0 20 20" fill="none"><path d="M5 3.5h10v13H5zM7.5 7h5M7.5 10h5M7.5 13h3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>Appointments</span>
+        <span><svg aria-hidden="true" viewBox="0 0 20 20" fill="none"><path d="M3.5 5.5h13v9h-13zM6 5.5V4M14 5.5V4M6.5 9h7M6.5 12h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>Vehicle notes</span>
+        <span><svg aria-hidden="true" viewBox="0 0 20 20" fill="none"><path d="M10 4a6 6 0 1 0 5.2 3M10 6.5V10l2.5 1.5M14.5 4v3h-3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>Visit history</span>
+      </div>
     </div>
   );
 }

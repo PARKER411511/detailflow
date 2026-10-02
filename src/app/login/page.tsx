@@ -33,10 +33,10 @@ export default function LoginPage() {
     <section className="auth-shell" aria-label="DetailFlow account access">
       <div className="auth-visual">
         <Image
-          src="/images/detailflow-auth-split-v1.png"
-          alt=""
+          src="/images/detailflow-dark-studio-v1.png"
+          alt="Graphite coupe in the DetailFlow studio"
           fill
-          sizes="(min-width: 768px) 48vw, 0px"
+          sizes="(min-width: 768px) max(48vw, 178vh), 0px"
           className="auth-visual-image"
           priority
         />
@@ -45,8 +45,10 @@ export default function LoginPage() {
           <BrandLink light />
         </div>
         <div className="auth-visual-caption">
-          <p className="auth-overline">DetailFlow studio</p>
-          <p className="auth-craft-line">Care is a craft. Every visit starts here.</p>
+          <p className="auth-overline">Workshop / account desk</p>
+          <h2 className="auth-visual-title">Keep the finish<br />in focus.</h2>
+          <p className="auth-craft-line">Your appointments, vehicle notes, and visit history in one place.</p>
+          <div className="auth-visual-points"><span>01 / Clear scope</span><span>02 / One-bay studio</span></div>
         </div>
       </div>
 
