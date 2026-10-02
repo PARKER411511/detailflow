@@ -281,7 +281,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .marketing-service-grid .home-service-card { background: #101318; }
 .marketing-service-note { display: grid; gap: 2rem; margin-top: 4rem; border-top: 1px solid #d5d7da; padding-top: 3rem; }
 .marketing-service-note img { width: 100%; height: 15rem; object-fit: cover; }
-.marketing-service-note h2 { max-width: 28rem; }
+.marketing-service-note > div { display: flex; flex-direction: column; align-items: flex-start; gap: 1.15rem; }
+.marketing-service-note h2 { max-width: 28rem; margin: 0; }
+.marketing-service-note .marketing-button { align-self: flex-start; margin-top: .25rem; }
 .marketing-button { display: inline-flex; min-height: 3rem; align-items: center; justify-content: center; gap: .6rem; border-radius: 999px; background: #315bff; padding: .8rem 1.25rem; color: #fff; font-size: .84rem; font-weight: 700; }
 .marketing-button:hover { background: #4b70ff; }
 .marketing-back-link { display: inline-flex; min-height: 2.75rem; align-items: center; color: #c6cedd; font-size: .82rem; font-weight: 650; }

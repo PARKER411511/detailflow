@@ -25,7 +25,7 @@ const process = [
 ] as const;
 
 const work = [
-  ["Paint / reflection", "/images/detailflow-paint-detail.png", "Water beads catching the light across a cared-for surface."],
+  ["Paint / reflection", "/images/detailflow-paint-reflection-v2.png", "Dry silver paint catching a clean studio reflection."],
   ["Cabin / material", "/images/detailflow-materials-v2.png", "A close look at the textures that make a cabin feel finished."],
   ["Wheel / finish", "/images/detailflow-wheel-v2.png", "Clean edges and quiet contrast around the wheel and panel."],
   ["Interior / handover", "/images/detailflow-interior.png", "A calm interior reset ready for the next drive."],
