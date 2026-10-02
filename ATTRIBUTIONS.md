@@ -22,3 +22,7 @@ Typography is bundled locally for deterministic previews: `src/fonts/Geist-wght.
 - `detailflow-hero.png` and `detailflow-before.png`: an earlier matching coupe concept pair retained as fallback/reference assets; the latter is an edited dusty-road-grime version.
 
 No supplied competitor or reference imagery was copied. The UI labels the comparison and portfolio images as illustrative concepts.
+
+## Split account page image
+
+The original detailflow-auth-split-v1.png was generated with the built-in image generation tool for the account page. Prompt: portrait silver performance coupe in the lower half of an atmospheric deep navy studio, royal-blue light, polished metallic paint, quiet upper space, no text, logos, people, orange, or gold. The supplied login reference informed the page composition only; its artwork was not copied.

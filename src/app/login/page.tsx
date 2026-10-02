@@ -3,7 +3,69 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { AuthForm } from "@/components/auth-form";
+
 export const metadata: Metadata = { title: "Sign in" };
+
+function BrandMark({ className = "" }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 38 38" className={className} fill="none">
+      <path d="M4 7h18l12 12-12 12H4l11-12L4 7Z" stroke="currentColor" strokeWidth="2" />
+      <path d="M4 19h18M19 7v24" stroke="var(--blue-bright)" strokeWidth="2" />
+    </svg>
+  );
+}
+
+function BrandLink({ light = false }: { light?: boolean }) {
+  return (
+    <Link
+      href="/"
+      className={`auth-wordmark ${light ? "auth-wordmark-light" : ""}`}
+      aria-label="Back to DetailFlow home"
+    >
+      <BrandMark className="h-8 w-8" />
+      <span>DETAILFLOW</span>
+    </Link>
+  );
+}
+
 export default function LoginPage() {
-  return <section className="min-h-screen bg-[var(--surface)] px-5 py-6 sm:px-8 lg:px-10 lg:py-8"><div className="mx-auto max-w-[1320px]"><div className="flex items-center justify-between border-b border-slate-300 pb-5"><Link href="/" className="flex items-center gap-3" aria-label="Back to DetailFlow home"><svg aria-hidden="true" viewBox="0 0 38 38" className="h-8 w-8 text-[var(--ink)]" fill="none"><path d="M4 7h18l12 12-12 12H4l11-12L4 7Z" stroke="currentColor" strokeWidth="2" /><path d="M4 19h18M19 7v24" stroke="var(--blue)" strokeWidth="2" /></svg><span className="text-[13px] font-bold tracking-[.24em] text-[var(--ink)]">DETAILFLOW</span></Link><Link href="/" className="text-sm font-semibold text-slate-600 hover:text-[var(--blue)]">Back to home <span aria-hidden className="ml-2">↗</span></Link></div><div className="grid gap-10 py-8 lg:grid-cols-[.8fr_1.2fr] lg:items-start lg:gap-16 lg:py-10"><div className="order-1 max-w-[470px] lg:order-none"><p className="editorial-kicker text-[var(--blue)]">Account / 01</p><Suspense fallback={<div className="mt-5 h-96 animate-pulse border-t border-slate-200 bg-slate-50" />}><div className="mt-5"><AuthForm /></div></Suspense></div><div className="order-2 relative hidden min-h-[500px] overflow-hidden bg-[var(--navy)] lg:order-none lg:block corner-cut"><Image src="/images/detailflow-motorsport-auth-v1.png" alt="Silver coupe fender and wheel detail in a graphite studio with cobalt reflection" fill sizes="(max-width: 1280px) 55vw, 650px" className="object-cover object-center" /><div className="absolute inset-0 bg-gradient-to-t from-[var(--navy)]/80 via-transparent to-transparent" /><div className="absolute left-8 top-8 bg-[var(--navy)] px-3 py-2 tech-label text-white">DF / AUTH — Material study</div><div className="absolute bottom-8 left-8 right-8 text-white"><p className="editorial-kicker text-blue-300">Your DetailFlow account</p><p className="mt-3 max-w-md text-xl font-semibold tracking-[-.03em]">Keep your next visit in motion.</p><p className="mt-3 max-w-md text-sm leading-6 text-blue-100/70">Appointments, vehicle notes, and clear handovers in one place.</p></div></div></div></div></section>;
+  return (
+    <section className="auth-shell" aria-label="DetailFlow account access">
+      <div className="auth-visual">
+        <Image
+          src="/images/detailflow-auth-split-v1.png"
+          alt=""
+          fill
+          sizes="(min-width: 768px) 48vw, 0px"
+          className="auth-visual-image"
+          priority
+        />
+        <div className="auth-visual-shade" />
+        <div className="auth-visual-brand">
+          <BrandLink light />
+        </div>
+        <div className="auth-visual-caption">
+          <p className="auth-overline">DetailFlow studio</p>
+          <p className="auth-craft-line">Care is a craft. Every visit starts here.</p>
+        </div>
+      </div>
+
+      <div className="auth-panel">
+        <div className="auth-mobile-header">
+          <BrandLink />
+          <Link href="/" className="auth-back-link">
+            Back home <span aria-hidden="true">↗</span>
+          </Link>
+        </div>
+        <Link href="/" className="auth-back-link auth-desktop-back">
+          Back home <span aria-hidden="true">↗</span>
+        </Link>
+        <div className="auth-form-column">
+          <Suspense fallback={<div className="auth-loading" aria-hidden="true" />}>
+            <AuthForm />
+          </Suspense>
+        </div>
+      </div>
+    </section>
+  );
 }

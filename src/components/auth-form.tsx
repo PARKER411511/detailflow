@@ -1,7 +1,24 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient, isConfigured } from "@/lib/supabase/browser";
+
+const DEMO_MESSAGE = "Portfolio demo — account access is unavailable in this preview.";
+
+function EyeIcon({ crossed = false }: { crossed?: boolean }) {
+  return crossed ? (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="m3 3 18 18M10.6 10.7a2 2 0 0 0 2.7 2.7M9.9 5.1A10.8 10.8 0 0 1 12 4.9c5.1 0 8.5 4.8 9.5 7.1a12.4 12.4 0 0 1-3.1 4.2M6.2 6.3C3.8 8 2.6 10.5 2.5 12c1 2.3 4.4 7.1 9.5 7.1 1.1 0 2.1-.2 3-.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ) : (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M2.5 12S5.9 4.9 12 4.9 21.5 12 21.5 12 18.1 19.1 12 19.1 2.5 12 2.5 12Z" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="12" cy="12" r="2.7" />
+    </svg>
+  );
+}
+
 export function AuthForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -31,46 +48,73 @@ export function AuthForm() {
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage(null);
-    if (!configured) { setMessage("Portfolio demonstration — accounts cannot be confirmed here."); return; }
+    if (!configured) {
+      setMessage(DEMO_MESSAGE);
+      return;
+    }
     setLoading(true);
-    try { const supabase = createClient(); const result = mode === "signin" ? await supabase.auth.signInWithPassword({ email, password }) : await supabase.auth.signUp({ email, password, options: { data: { full_name: name }, emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` } }); if (result.error) { setMessage(result.error.message); return; } if (mode === "signup" && !result.data.session) setMessage("Check your email to confirm your account, then come back here to sign in."); else router.push(next); } catch { setMessage("We could not complete that account request. Please try again."); } finally { setLoading(false); }
+    try {
+      const supabase = createClient();
+      const result =
+        mode === "signin"
+          ? await supabase.auth.signInWithPassword({ email, password })
+          : await supabase.auth.signUp({
+              email,
+              password,
+              options: {
+                data: { full_name: name },
+                emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+              },
+            });
+      if (result.error) {
+        setMessage(result.error.message);
+        return;
+      }
+      if (mode === "signup" && !result.data.session) {
+        setMessage("Check your email to confirm your account, then come back here to sign in.");
+      } else {
+        router.push(next);
+      }
+    } catch {
+      setMessage("We could not complete that account request. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
+
   async function resetPassword() {
     setMessage(null);
     if (!email) {
       setMessage("Enter your email first.");
       return;
     }
-    if (!configured) { setMessage("Portfolio demonstration — accounts cannot be confirmed here."); return; }
+    if (!configured) {
+      setMessage(DEMO_MESSAGE);
+      return;
+    }
     setLoading(true);
-    try { const supabase = createClient(); const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/callback?next=/account/reset` }); setMessage(error ? error.message : "If an account exists for that email, you’ll receive a reset link shortly."); } catch { setMessage("We could not complete that password request. Please try again."); } finally { setLoading(false); }
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/callback?next=/account/reset`,
+      });
+      setMessage(error ? error.message : "If an account exists for that email, you’ll receive a reset link shortly.");
+    } catch {
+      setMessage("We could not complete that password request. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
+
   return (
-    <div>
-      <div className="flex gap-6 border-b border-slate-300">
-        <button
-          type="button"
-          onClick={() => switchMode("signin")}
-          aria-pressed={isSignIn}
-          className={`min-h-11 border-b-2 pb-3 text-sm font-bold ${isSignIn ? "border-[var(--blue)] text-[var(--blue)]" : "border-transparent text-slate-500"}`}
-        >
-          Sign in
-        </button>
-        <button
-          type="button"
-          onClick={() => switchMode("signup")}
-          aria-pressed={!isSignIn}
-          className={`min-h-11 border-b-2 pb-3 text-sm font-bold ${!isSignIn ? "border-[var(--blue)] text-[var(--blue)]" : "border-transparent text-slate-500"}`}
-        >
-          Create account
-        </button>
-      </div>
-      <h1 className="mt-6 text-4xl font-semibold tracking-[-.055em] text-[var(--ink)] sm:text-5xl">{isSignIn ? "Welcome back." : "Create your account."}</h1>
-      <p className="mt-2 max-w-md text-sm leading-6 text-slate-600">{isSignIn ? "Sign in to manage appointments, vehicle notes, and your next handover." : "Keep your appointment details and vehicle notes together in one place."}</p>
-      {!configured && <p className="mt-3 border-l-2 border-[var(--blue)] bg-blue-50 px-4 py-2 text-xs leading-5 text-blue-950">Portfolio demo — account access is unavailable in this preview.</p>}
-      <form onSubmit={submit} className="mt-5 space-y-4" aria-describedby={message ? "auth-status" : undefined}>
+    <div className="auth-form-content" data-auth-mode={mode}>
+      <h1 className="auth-title">{isSignIn ? "Welcome back" : "Create your account"}</h1>
+      <p className="auth-intro">
+        {isSignIn ? "Sign in to manage your appointments and vehicle notes." : "Create an account to keep your appointments and vehicle notes together."}
+      </p>
+      <form onSubmit={submit} className="auth-form" aria-describedby={message ? "auth-status" : undefined}>
         {mode === "signup" && (
-          <label htmlFor="auth-name" className="block text-sm font-semibold text-slate-700">
+          <label htmlFor="auth-name" className="auth-label">
             Name
             <input
               id="auth-name"
@@ -78,11 +122,11 @@ export function AuthForm() {
               autoComplete="name"
               value={name}
               onChange={(event) => setName(event.target.value)}
-              className="field mt-2"
+              className="auth-field"
             />
           </label>
         )}
-        <label htmlFor="auth-email" className="block text-sm font-semibold text-slate-700">
+        <label htmlFor="auth-email" className="auth-label">
           Email
           <input
             id="auth-email"
@@ -91,59 +135,57 @@ export function AuthForm() {
             autoComplete="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            className="field mt-2"
+            className="auth-field"
           />
         </label>
-        <div>
-          <label htmlFor="auth-password" className="block text-sm font-semibold text-slate-700">Password</label>
-          <div className="relative mt-2">
-            <input
-              id="auth-password"
-              required
-              minLength={8}
-              type={showPassword ? "text" : "password"}
-              autoComplete={isSignIn ? "current-password" : "new-password"}
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="field pr-24"
-            />
-            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-2 top-1/2 min-h-11 -translate-y-1/2 px-3 text-xs font-bold text-[var(--blue)] hover:text-[var(--blue-dark)]" aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? "Hide" : "Show"}</button>
+        <div className="auth-password-group">
+          <div className="auth-label">
+            <label htmlFor="auth-password">Password</label>
+            <span className="auth-password-input">
+              <input
+                id="auth-password"
+                required
+                minLength={8}
+                type={showPassword ? "text" : "password"}
+                autoComplete={isSignIn ? "current-password" : "new-password"}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                className="auth-field"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((visible) => !visible)}
+                className="auth-password-toggle"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-pressed={showPassword}
+              >
+                <EyeIcon crossed={showPassword} />
+              </button>
+            </span>
           </div>
+          {isSignIn && (
+            <button type="button" onClick={resetPassword} disabled={loading} className="auth-recovery">
+              Forgot password?
+            </button>
+          )}
         </div>
-        {message && (
-          <p
-            id="auth-status"
-            role="status"
-            className="border-l-2 border-[var(--blue)] bg-blue-50 p-4 text-sm leading-6 text-blue-900"
-          >
-            {message}
-          </p>
-        )}
-        <button
-          disabled={loading}
-          type="submit"
-          className="action-primary w-full px-5 py-4"
-        >
-          {loading
-            ? "Working…"
-            : isSignIn
-              ? "Sign in"
-              : "Create account"}
-          <span aria-hidden className="ml-3">
-            ↗
-          </span>
+        <button disabled={loading} type="submit" className="auth-submit">
+          {loading ? "Working…" : isSignIn ? "Sign in" : "Create account"}
+          <span aria-hidden="true">↗</span>
         </button>
       </form>
-      {mode === "signin" && (
-        <button
-          type="button"
-          onClick={resetPassword}
-          disabled={loading}
-          className="mt-5 min-h-11 text-left text-sm font-semibold text-[var(--blue)] hover:text-[var(--blue-dark)]"
-        >
-          Forgot your password?
-        </button>
+      {!configured && !message && <p className="auth-demo-note">{DEMO_MESSAGE}</p>}
+      {message && (
+        <p id="auth-status" role="status" className="auth-status">
+          {message}
+        </p>
       )}
+      <p className="auth-mode-switch">
+        {isSignIn ? "New to DetailFlow?" : "Already have an account?"}{" "}
+        <button type="button" onClick={() => switchMode(isSignIn ? "signup" : "signin")}>
+          {isSignIn ? "Create an account" : "Sign in"}
+        </button>
+      </p>
     </div>
   );
 }
