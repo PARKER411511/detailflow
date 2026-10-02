@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-const standardNav = [["Services", "/services"], ["Gallery", "/gallery"], ["Our approach", "/about"], ["Contact", "/contact"]];
+const standardNav = [["Services", "/services"], ["Work", "/gallery"], ["Studio", "/about"], ["Contact", "/contact"]];
 const homeNav = [["Services", "/services"], ["Work", "/gallery"], ["Studio", "/about"], ["Contact", "/contact"]];
 
 function BrandMark() {
@@ -18,11 +18,13 @@ function BrandMark() {
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
-  const isHome = usePathname() === "/";
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+  const darkHeader = true;
   const nav = isHome ? homeNav : standardNav;
 
   return (
-    <header className={`site-header ${isHome ? "site-header-home" : ""}`}>
+    <header className={`site-header ${darkHeader ? "site-header-dark" : ""} ${isHome ? "site-header-home" : ""}`}>
       <div className="site-header-inner">
         <Link href="/" onClick={() => setOpen(false)} aria-label="DetailFlow home" className="site-header-brand">
           <BrandMark />

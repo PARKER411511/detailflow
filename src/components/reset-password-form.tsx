@@ -12,7 +12,7 @@ export function ResetPasswordForm() {
     event.preventDefault();
     setMessage(null);
     if (!isConfigured()) {
-      setMessage("Portfolio demonstration — accounts cannot be confirmed here.");
+      setMessage("Portfolio demo — account access is unavailable in this preview.");
       return;
     }
     if (password.length < 8 || password !== confirm) {
@@ -38,15 +38,12 @@ export function ResetPasswordForm() {
   return (
     <form
       onSubmit={submit}
-      className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm sm:p-9"
+      className="reset-card"
     >
-      <p className="text-xs font-bold uppercase tracking-[.18em] text-blue-600">
-        Password reset
-      </p>
-      <h1 className="mt-4 text-3xl font-semibold text-[#0b1739]">
-        Choose a new password.
-      </h1>
-      <div className="mt-7 space-y-5">
+      <p className="dashboard-kicker">Password reset</p>
+      <h1>Choose a new password</h1>
+      <p className="reset-copy">Use at least 8 characters, then confirm the new password.</p>
+      <div className="reset-fields">
         <label className="block text-sm font-medium text-slate-700">
           New password
           <input
@@ -55,7 +52,7 @@ export function ResetPasswordForm() {
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            className="mt-2 field"
+            className="field"
           />
         </label>
         <label className="block text-sm font-medium text-slate-700">
@@ -66,13 +63,13 @@ export function ResetPasswordForm() {
             type="password"
             value={confirm}
             onChange={(event) => setConfirm(event.target.value)}
-            className="mt-2 field"
+            className="field"
           />
         </label>
         {message && (
           <p
             role="status"
-            className="rounded-md bg-blue-50 p-4 text-sm leading-6 text-blue-800"
+            className="dashboard-alert dashboard-alert-info"
           >
             {message}
           </p>
@@ -80,7 +77,7 @@ export function ResetPasswordForm() {
         <button
           disabled={loading}
           type="submit"
-          className="action-primary w-full px-5 py-4"
+          className="action-primary w-full"
         >
           {loading ? "Updating…" : "Update password"}
         </button>

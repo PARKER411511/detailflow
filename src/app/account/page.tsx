@@ -6,6 +6,7 @@ import { formatCurrency, formatDate } from "@/lib/format";
 import { AccountActions } from "@/components/account-actions";
 import { ProfileForm } from "@/components/profile-form";
 import { getStudioTimezone } from "@/lib/studio-settings";
+import { StatusBadge } from "@/components/status-badge";
 
 export const metadata: Metadata = { title: "Your account" };
 
@@ -22,21 +23,17 @@ type AccountBooking = {
 export default async function AccountPage() {
   if (!isSupabaseConfigured()) {
     return (
-      <section className="px-5 py-24 sm:px-8">
-        <div className="mx-auto max-w-3xl border-t border-blue-300 pt-8">
-          <p className="editorial-kicker text-[#2563eb]">Preview mode</p>
-          <h1 className="display mt-5 text-6xl font-semibold text-[#0b1739]">
-            Your account is ready when the studio is.
-          </h1>
-          <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
-            This portfolio demonstration does not confirm appointments or maintain live account history.
-          </p>
-          <Link
-            href="/booking"
-            className="action-primary mt-8 inline-flex px-5 py-3 text-sm"
-          >
-            Return to booking
-          </Link>
+      <section className="functional-page account-page account-preview">
+        <div className="dashboard-shell">
+          <div className="dashboard-state-card">
+            <p className="dashboard-kicker">Account preview</p>
+            <h1>Your appointments</h1>
+            <p>This portfolio preview is not connected to live account history or appointment records.</p>
+            <div className="dashboard-actions">
+              <Link href="/services" className="action-primary">Browse services <span aria-hidden="true">↗</span></Link>
+              <Link href="/login" className="action-secondary">Sign in</Link>
+            </div>
+          </div>
         </div>
       </section>
     );
@@ -78,83 +75,45 @@ export default async function AccountPage() {
     ) ?? [];
 
   return (
-    <section className="px-5 py-16 sm:px-8 lg:py-24">
-      <div className="mx-auto max-w-6xl">
-        <div className="grid gap-10 border-b border-slate-200 pb-10 lg:grid-cols-[1fr_auto] lg:items-end">
+    <section className="functional-page account-page">
+      <div className="dashboard-shell">
+        <div className="dashboard-header">
           <div>
-            <p className="editorial-kicker text-[#2563eb]">Your account</p>
-            <h1 className="display mt-5 text-6xl font-semibold text-[#0b1739] sm:text-8xl">
-              Welcome back.
-            </h1>
-            <p className="mt-5 text-slate-600">{user.email}</p>
+            <p className="dashboard-kicker">Customer account</p>
+            <h1>Your appointments</h1>
+            <p className="dashboard-subtitle">Signed in as {user.email}</p>
           </div>
-          <form action="/auth/signout" method="post">
-            <button className="rounded-md border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 hover:border-[#2563eb] hover:text-[#2563eb]">
-              Sign out
-            </button>
-          </form>
+          <div className="dashboard-actions">
+            <Link href="/booking" className="action-primary">Book a detail <span aria-hidden="true">↗</span></Link>
+            <form action="/auth/signout" method="post">
+              <button className="action-secondary" type="submit">Sign out</button>
+            </form>
+          </div>
         </div>
 
-        <div className="mt-12 grid gap-14 lg:grid-cols-[1.15fr_.85fr] lg:items-start">
-          <div>
-            <div className="flex items-end justify-between gap-5">
-              <div>
-                <p className="editorial-kicker text-[#2563eb]">Appointments</p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-[-.05em] text-[#0b1739]">
-                  Your calendar.
-                </h2>
-              </div>
-              <Link
-                href="/booking"
-                className="text-sm font-semibold text-[#2563eb] hover:text-[#1d4ed8]"
-              >
-                Book another ↗
-              </Link>
-            </div>
-            {error ? (
-              <p className="mt-8 border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-                We could not load your appointments right now. Please try again.
-              </p>
-            ) : bookings?.length ? (
-              <div className="mt-8 space-y-12">
-                <BookingGroup
-                  title="Upcoming"
-                  bookings={upcoming}
-                  studioTimezone={studioTimezone}
-                />
-                <BookingGroup
-                  title="Past"
-                  bookings={past}
-                  studioTimezone={studioTimezone}
-                />
-              </div>
-            ) : (
-              <div className="mt-8 border-t border-slate-200 py-8">
-                <p className="font-semibold text-[#0b1739]">No appointments yet.</p>
-                <p className="mt-2 text-sm text-slate-500">
-                  When you’re ready, we’ll be here.
-                </p>
-                <Link
-                  href="/booking"
-                  className="action-primary mt-5 inline-flex px-5 py-3 text-sm"
-                >
-                  Find a time
-                </Link>
-              </div>
-            )}
+        <div className="dashboard-grid">
+          <div className="dashboard-main">
+            <section className="dashboard-panel" aria-labelledby="appointments-heading">
+              <div className="dashboard-panel-heading"><div><p className="dashboard-kicker">Appointments</p><h2 id="appointments-heading">Your calendar</h2></div><span className="dashboard-count">{error ? "—" : `${bookings?.length ?? 0} total`}</span></div>
+              {error ? (
+                <p className="dashboard-alert dashboard-alert-error">We could not load your appointments right now. Please try again.</p>
+              ) : bookings?.length ? (
+                <div className="dashboard-groups">
+                  <BookingGroup title="Upcoming" bookings={upcoming} studioTimezone={studioTimezone} />
+                  <BookingGroup title="Past" bookings={past} studioTimezone={studioTimezone} />
+                </div>
+              ) : (
+                <div className="dashboard-empty"><strong>No appointments yet.</strong><p>Choose a service when you’re ready and we’ll keep the details here.</p><Link href="/booking" className="action-primary">Find a time <span aria-hidden="true">↗</span></Link></div>
+              )}
+            </section>
           </div>
-
-          <div className="border-t border-slate-300 pt-8">
-            <p className="editorial-kicker text-[#2563eb]">Your details</p>
-            <p className="mt-3 max-w-sm text-sm leading-6 text-slate-600">
-              Keep a phone number and name on file so the studio can reach you
-              about an appointment.
-            </p>
-            <ProfileForm
-              initialName={profile?.full_name ?? ""}
-              initialPhone={profile?.phone ?? ""}
-            />
-          </div>
+          <aside className="dashboard-aside">
+            <section className="dashboard-panel dashboard-profile" aria-labelledby="profile-heading">
+              <div className="dashboard-panel-heading"><div><p className="dashboard-kicker">Account details</p><h2 id="profile-heading">Your profile</h2></div></div>
+              <p className="dashboard-panel-copy">Keep a name and phone number on file so the studio can reach you about an appointment.</p>
+              <ProfileForm initialName={profile?.full_name ?? ""} initialPhone={profile?.phone ?? ""} />
+            </section>
+          </aside>
         </div>
       </div>
     </section>
@@ -171,45 +130,29 @@ function BookingGroup({
   studioTimezone: string;
 }) {
   return (
-    <section>
-      <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-        <h3 className="editorial-kicker text-[#2563eb]">{title}</h3>
-        <span className="text-xs text-slate-500">{bookings.length}</span>
+    <section className="dashboard-group">
+      <div className="dashboard-group-heading">
+        <h3>{title}</h3>
+        <span>{bookings.length}</span>
       </div>
       {bookings.length ? (
-        <div className="divide-y divide-slate-200">
+        <div className="dashboard-booking-list">
           {bookings.map((booking) => {
             const serviceName = Array.isArray(booking.service)
               ? (booking.service[0] as { name?: string } | undefined)?.name
               : (booking.service as { name?: string } | null)?.name;
             return (
-              <div
-                key={booking.id}
-                className="flex flex-col justify-between gap-5 py-6 sm:flex-row sm:items-center"
-              >
+              <div key={booking.id} className="dashboard-booking-row">
                 <div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <p className="font-semibold text-[#0b1739]">
-                      {serviceName ?? "Detail service"}
-                    </p>
-                    <span className="border border-blue-200 px-2 py-1 text-[10px] font-bold uppercase tracking-[.12em] text-blue-700">
-                      {booking.status}
-                    </span>
+                  <div className="dashboard-booking-title">
+                    <p>{serviceName ?? "Detail service"}</p>
+                    <StatusBadge status={booking.status} />
                   </div>
-                  <p className="mt-2 text-sm text-slate-500">
-                    {formatDate(booking.starts_at, studioTimezone)} · Ref {booking.reference}
-                  </p>
-                  <p className="mt-1 text-sm text-slate-500">
-                    {formatCurrency(booking.total_price_cents / 100)}
-                  </p>
+                  <p className="dashboard-booking-meta">{formatDate(booking.starts_at, studioTimezone)} · Ref {booking.reference}</p>
+                  <p className="dashboard-booking-price">{formatCurrency(booking.total_price_cents / 100)}</p>
                 </div>
-                <div className="flex items-center gap-5">
-                  <Link
-                    href={`/account/bookings/${booking.id}`}
-                    className="text-sm font-semibold text-[#2563eb] hover:text-[#1d4ed8]"
-                  >
-                    Details
-                  </Link>
+                <div className="dashboard-booking-actions">
+                  <Link href={`/account/bookings/${booking.id}`} className="dashboard-text-link">Details <span aria-hidden="true">↗</span></Link>
                   {booking.status === "confirmed" ||
                   booking.status === "requested" ? (
                     <AccountActions bookingId={booking.id} />
@@ -220,7 +163,7 @@ function BookingGroup({
           })}
         </div>
       ) : (
-        <p className="py-5 text-sm text-slate-500">
+        <p className="dashboard-group-empty">
           No {title.toLowerCase()} appointments.
         </p>
       )}

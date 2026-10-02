@@ -247,8 +247,8 @@ export function AdminWorkspace({
     }
   }
   return (
-    <div className="mt-10 border-t border-slate-300 bg-white px-1 py-8 sm:px-2 sm:py-10">
-      <div className="flex flex-wrap gap-2 border-b border-slate-100 pb-5">
+    <div className="admin-workspace">
+      <div className="admin-tabs" aria-label="Admin workspace sections">
         {(
           [
             ["bookings", "Bookings"],
@@ -261,7 +261,7 @@ export function AdminWorkspace({
             type="button"
             key={value}
             onClick={() => setTab(value)}
-            className={`px-4 py-2 text-sm font-semibold ${tab === value ? "bg-[#173e8d] text-white" : "text-slate-500 hover:bg-slate-50"}`}
+            className={`admin-tab ${tab === value ? "admin-tab-active" : ""}`}
           >
             {label}
           </button>

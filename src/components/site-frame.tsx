@@ -10,7 +10,7 @@ type SiteFrameProps = Readonly<{
 
 export function SiteFrame({ children, header, footer }: SiteFrameProps) {
   const pathname = usePathname();
-  const isFocusedAuthRoute = pathname === "/login";
+  const isFocusedAuthRoute = pathname === "/login" || pathname === "/account/reset";
 
   if (isFocusedAuthRoute) return <>{children}</>;
 

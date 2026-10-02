@@ -77,7 +77,7 @@ export function BookingForm({
       const body = await response.json();
       if (requestId !== availabilityRequest.current) return;
       if (!response.ok)
-        throw new Error(body.error ?? "Availability could not be loaded.");
+        throw new Error(configured ? (body.error ?? "Availability could not be loaded.") : "Appointments unavailable in this preview.");
       setSlots(body.slots ?? []);
       if (!body.slots?.length)
         setMessage({
@@ -300,6 +300,11 @@ export function BookingForm({
             className="mt-2 field"
           />
         </label>
+        {!configured && (
+          <p className="mt-3 text-xs leading-5 text-slate-500">
+            Appointments unavailable in this preview; date and time selection is shown for layout only.
+          </p>
+        )}
         {date && (
           <div className="mt-5">
             <p className="text-sm font-medium text-slate-700">
@@ -333,7 +338,7 @@ export function BookingForm({
               </div>
             ) : (
               <p className="mt-4 rounded-md bg-slate-50 p-4 text-sm text-slate-500">
-                {configured ? "No openings on this date. Try another day." : "Portfolio demonstration — appointments cannot be confirmed here."}
+                {configured ? "No openings on this date. Try another day." : "Portfolio demo — appointments are unavailable in this preview."}
               </p>
             )}
           </div>
