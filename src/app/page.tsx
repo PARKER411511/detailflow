@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { BeforeAfter } from "@/components/before-after";
 import { ServiceCard } from "@/components/service-card";
-import { serviceImage } from "@/data/services";
 import { getPublicServices } from "@/lib/public-services";
 
 const homeImages = {
@@ -89,7 +88,7 @@ export default async function Home() {
             <Link href="/services" className="home-text-link">All services & pricing <span aria-hidden="true">↗</span></Link>
           </div>
           <div className="home-services-grid">
-            {services.length ? services.map((service) => <ServiceCard key={service.slug} service={service} variant="compact" image={serviceImage(service.slug)} />) : <p className="home-empty-state">The studio menu is unavailable in this preview.</p>}
+            {services.length ? services.map((service, index) => <ServiceCard key={service.slug} service={service} variant="compact" ordinal={index + 1} />) : <p className="home-empty-state">The studio menu is unavailable in this preview.</p>}
           </div>
         </div>
       </section>
