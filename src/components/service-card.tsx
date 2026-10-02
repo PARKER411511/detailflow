@@ -9,7 +9,39 @@ const imageLabels: Record<string, string> = {
   "the-signature": "Interior + protection",
 };
 
-export function ServiceCard({ service, featured = false, image }: { service: Service; featured?: boolean; image?: string }) {
+const homeCategories: Record<string, string> = {
+  "the-refresh": "Exterior reset",
+  "the-correction": "Paint clarity",
+  "the-signature": "Full expression",
+};
+
+type ServiceCardProps = {
+  service: Service;
+  featured?: boolean;
+  image?: string;
+  variant?: "default" | "compact";
+};
+
+export function ServiceCard({ service, featured = false, image, variant = "default" }: ServiceCardProps) {
+  if (variant === "compact") {
+    return (
+      <article className="home-service-card">
+        <div className="home-service-card-top">
+          <p className="home-service-category">{homeCategories[service.slug] ?? "Studio service"}</p>
+        </div>
+        <h3>{service.name}</h3>
+        <div className="home-service-meta">
+          <span>{formatCurrency(service.price)}</span>
+          <span>{service.duration}</span>
+        </div>
+        <ul>
+          {service.inclusions.slice(0, 3).map((inclusion) => <li key={inclusion}>{inclusion}</li>)}
+        </ul>
+        <Link href={`/service/${service.slug}`} className="home-service-link">Explore service <span aria-hidden="true">↗</span></Link>
+      </article>
+    );
+  }
+
   return (
     <article className={`group border-t-2 border-slate-300 ${featured ? "border-t-[var(--blue)]" : ""}`}>
       <Link href={`/service/${service.slug}`} className="block">
