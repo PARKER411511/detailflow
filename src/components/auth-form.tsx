@@ -23,6 +23,7 @@ export function AuthForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const rawNext = searchParams.get("next");
+  const callbackError = searchParams.get("error");
   const next =
     rawNext &&
     rawNext.startsWith("/") &&
@@ -34,7 +35,11 @@ export function AuthForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(
+    callbackError === "auth_callback"
+      ? "That sign-in link is invalid or has expired. Please try again."
+      : null,
+  );
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const isSignIn = mode === "signin";

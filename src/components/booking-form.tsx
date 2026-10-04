@@ -28,7 +28,9 @@ export function BookingForm({
   const [date, setDate] = useState("");
   const [slots, setSlots] = useState<Slot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState("");
-  const [vehicle, setVehicle] = useState("");
+  const [vehicleYear, setVehicleYear] = useState("");
+  const [vehicleMake, setVehicleMake] = useState("");
+  const [vehicleModel, setVehicleModel] = useState("");
   const [notes, setNotes] = useState("");
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -42,6 +44,7 @@ export function BookingForm({
     () => services.find((item) => item.slug === serviceSlug),
     [serviceSlug, services],
   );
+  const vehicle = [vehicleYear.trim(), vehicleMake.trim(), vehicleModel.trim()].filter(Boolean).join(" ");
   const minDate = new Date();
   minDate.setDate(minDate.getDate() + 1);
   const maxDate = new Date();
@@ -113,6 +116,10 @@ export function BookingForm({
         date?: string;
         selectedSlot?: string;
         vehicle?: string;
+        vehicleYear?: string;
+        vehicleMakeModel?: string;
+        vehicleMake?: string;
+        vehicleModel?: string;
         notes?: string;
       };
       const restoredService = services.some((item) => item.slug === draft.serviceSlug)
@@ -120,7 +127,9 @@ export function BookingForm({
         : services[0]?.slug;
       if (!restoredService) return;
       setServiceSlug(restoredService);
-      setVehicle(draft.vehicle ?? "");
+      setVehicleYear(draft.vehicleYear ?? "");
+      setVehicleMake(draft.vehicleMake ?? draft.vehicleMakeModel ?? draft.vehicle ?? "");
+      setVehicleModel(draft.vehicleModel ?? "");
       setNotes(draft.notes ?? "");
       if (draft.date) {
         setDate(draft.date);
@@ -161,7 +170,7 @@ export function BookingForm({
     try {
       window.sessionStorage.setItem(
         "detailflow-booking-draft",
-        JSON.stringify({ serviceSlug, date, selectedSlot, vehicle, notes }),
+        JSON.stringify({ serviceSlug, date, selectedSlot, vehicle, vehicleYear, vehicleMake, vehicleModel, notes }),
       );
     } catch {
       // Auth navigation still works when browser storage is unavailable.
@@ -357,17 +366,41 @@ export function BookingForm({
           <span className="text-xs text-slate-500">3 / 3</span>
         </div>
         <div className="grid gap-5">
-          <label className="text-sm font-medium text-slate-700">
-            Vehicle
-            <input
-              required
-              name="vehicle"
-              value={vehicle}
-              onChange={(event) => setVehicle(event.target.value)}
-              placeholder="Year, make, model"
-              className="mt-2 field placeholder:text-slate-500"
-            />
-          </label>
+          <div className="grid gap-5 sm:grid-cols-3">
+            <label className="text-sm font-medium text-slate-700">
+              Year
+              <input
+                name="vehicle-year"
+                inputMode="numeric"
+                value={vehicleYear}
+                onChange={(event) => setVehicleYear(event.target.value)}
+                placeholder="2024"
+                className="mt-2 field placeholder:text-slate-500"
+              />
+            </label>
+            <label className="text-sm font-medium text-slate-700">
+              Make
+              <input
+                required
+                name="vehicle-make"
+                value={vehicleMake}
+                onChange={(event) => setVehicleMake(event.target.value)}
+                placeholder="Porsche"
+                className="mt-2 field placeholder:text-slate-500"
+              />
+            </label>
+            <label className="text-sm font-medium text-slate-700">
+              Model
+              <input
+                required
+                name="vehicle-model"
+                value={vehicleModel}
+                onChange={(event) => setVehicleModel(event.target.value)}
+                placeholder="911 Carrera"
+                className="mt-2 field placeholder:text-slate-500"
+              />
+            </label>
+          </div>
           <label className="text-sm font-medium text-slate-700">
             Anything we should know?
             <textarea

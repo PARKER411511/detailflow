@@ -2,10 +2,8 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
-import { formatCurrency, formatDate } from "@/lib/format";
-import { AdminBookingActions } from "@/components/admin/booking-actions";
+import { formatCurrency } from "@/lib/format";
 import { AdminWorkspace } from "@/components/admin/admin-workspace";
-import { StatusBadge } from "@/components/status-badge";
 export const metadata: Metadata = { title: "Admin dashboard" };
 export default async function AdminPage() {
   if (!isSupabaseConfigured()) return <Setup />;
@@ -28,12 +26,21 @@ export default async function AdminPage() {
         </div>
       </section>
     );
-  const { data: bookings, error } = await supabase.rpc("admin_list_bookings");
-  const { data: overviewRows, error: overviewError } = await supabase.rpc(
-    "admin_overview_counts",
+  const { data: bookings, error: bookingsError } = await supabase.rpc("admin_list_bookings");
+  const { data: metricsRows, error: overviewError } = await supabase.rpc(
+    "admin_dashboard_metrics",
   );
-  const overview = overviewRows?.[0] as
-    | { total_bookings: number; active_services: number }
+  const overview = metricsRows?.[0] as
+    | {
+        total_bookings: number;
+        today_bookings: number;
+        upcoming_bookings: number;
+        requested_bookings: number;
+        completed_bookings: number;
+        customer_count: number;
+        booked_value_cents: number;
+        active_services: number;
+      }
     | undefined;
   const typedBookings = (bookings ?? []) as Array<{
     id: string;
@@ -45,7 +52,7 @@ export default async function AdminPage() {
     total_price_cents: number;
     status: string;
   }>;
-  const { data: services } = await supabase
+  const { data: services, error: servicesError } = await supabase
     .from("services")
     .select(
       "id, slug, name, eyebrow, description, details, duration_minutes, price_cents, active, display_order",
@@ -69,77 +76,45 @@ export default async function AdminPage() {
           <span className="admin-verified">Admin verified</span>
         </div>
         <div className="admin-metrics">
-          <div className="admin-metric admin-metric-primary"><span>All bookings</span><strong>{overviewError ? "—" : (overview?.total_bookings ?? "—")}</strong><small>{overviewError ? "Count unavailable" : "Live database"}</small></div>
-          <div className="admin-metric"><span>Active services</span><strong>{overviewError ? "—" : (overview?.active_services ?? "—")}</strong><small>{overviewError ? "Count unavailable" : "Public menu items"}</small></div>
-          <div className="admin-metric"><span>Calendar</span><strong>1 bay</strong><small>Shared occupancy schedule</small></div>
+          <Metric label="Today" value={overview?.today_bookings} detail="Appointments in studio time" primary={true} unavailable={Boolean(overviewError)} />
+          <Metric label="Upcoming" value={overview?.upcoming_bookings} detail="Requested, confirmed, or in service" unavailable={Boolean(overviewError)} />
+          <Metric label="Requests" value={overview?.requested_bookings} detail="Awaiting confirmation" unavailable={Boolean(overviewError)} />
+          <Metric label="Completed" value={overview?.completed_bookings} detail="All-time completed visits" unavailable={Boolean(overviewError)} />
+          <Metric label="Accounts" value={overview?.customer_count} detail="All Auth accounts, including staff" unavailable={Boolean(overviewError)} />
+          <Metric label="Booked value" value={overview ? formatCurrency(overview.booked_value_cents / 100) : undefined} detail="Scheduled value, not collected revenue" unavailable={Boolean(overviewError)} />
+          <Metric label="Services" value={overview?.active_services} detail="Public menu items" unavailable={Boolean(overviewError)} />
+          <Metric label="Total bookings" value={overview?.total_bookings} detail="Live database records" unavailable={Boolean(overviewError)} />
         </div>
-        <section className="dashboard-panel admin-bookings-panel" aria-labelledby="admin-bookings-heading">
-          <div className="dashboard-panel-heading"><div><p className="dashboard-kicker">Live queue</p><h2 id="admin-bookings-heading">Bookings</h2></div><p className="dashboard-panel-note">Requested → confirmed → complete</p></div>
-          {error ? (
-            <p className="dashboard-alert dashboard-alert-error">Unable to load the booking calendar.</p>
-          ) : bookings?.length ? (
-            <div className="admin-table-wrap">
-              <table className="admin-table">
-                <thead><tr>
-                    <th className="pb-3 pr-4">When</th>
-                    <th className="pb-3 pr-4">Customer</th>
-                    <th className="pb-3 pr-4">Service</th>
-                    <th className="pb-3 pr-4">Vehicle</th>
-                    <th className="pb-3">Status</th>
-                  </tr></thead>
-                <tbody>
-                  {typedBookings.map((booking) => (
-                    <tr key={booking.id}>
-                      <td><strong>{formatDate(booking.starts_at, studioTimezone)}</strong><small>{booking.reference}</small></td>
-                      <td>{booking.customer_email || "—"}</td>
-                      <td><strong>{booking.service_name}</strong><small>{formatCurrency(booking.total_price_cents / 100)}</small></td>
-                      <td>{booking.vehicle_description}</td>
-                      <td><StatusBadge status={booking.status} />
-                        <AdminBookingActions
-                          bookingId={booking.id}
-                          status={booking.status}
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="dashboard-empty"><strong>No appointments in the database yet.</strong><p>New booking requests will appear here when the studio receives them.</p></div>
-          )}
-        </section>
-        <section className="dashboard-panel admin-services-panel" aria-labelledby="admin-services-heading">
-          <div className="dashboard-panel-heading"><div><p className="dashboard-kicker">Menu</p><h2 id="admin-services-heading">Services</h2></div><p className="dashboard-panel-note">Active menu entries and rates</p></div>
-          <div className="admin-service-list">
-            {services?.map((service) => (
-              <div
-                key={service.id}
-                className="admin-service-row"
-              >
-                <div className="flex items-center justify-between">
-                  <p className="font-semibold text-[#0b1739]">{service.name}</p>
-                  <span
-                    className={`text-xs font-semibold ${service.active ? "text-emerald-600" : "text-slate-500"}`}
-                  >
-                    {service.active ? "Active" : "Hidden"}
-                  </span>
-                </div>
-                <p className="mt-2 text-sm text-slate-500">
-                  {service.duration_minutes} min ·{" "}
-                  {formatCurrency(service.price_cents / 100)}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
         <AdminWorkspace
           initialBookings={typedBookings}
           initialServices={services ?? []}
           studioTimezone={studioTimezone}
+          initialBookingsError={bookingsError ? "Unable to load live bookings. Try refreshing after checking the database connection." : undefined}
+          initialServicesError={servicesError ? "Unable to load service settings. The menu editor is unavailable until the database responds." : undefined}
         />
       </div>
     </section>
+  );
+}
+function Metric({
+  label,
+  value,
+  detail,
+  primary = false,
+  unavailable = false,
+}: {
+  label: string;
+  value: number | string | undefined;
+  detail: string;
+  primary?: boolean;
+  unavailable?: boolean;
+}) {
+  return (
+    <div className={`admin-metric ${primary ? "admin-metric-primary" : ""}`}>
+      <span>{label}</span>
+      <strong>{unavailable ? "—" : (value ?? "—")}</strong>
+      <small>{unavailable ? "Unavailable" : detail}</small>
+    </div>
   );
 }
 function Setup() {

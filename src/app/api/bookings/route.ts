@@ -35,6 +35,9 @@ function rpcFailure(error: { code?: string; message?: string }, fallback: string
   if (error.message?.includes("outside") || error.message?.includes("schedule") || error.message?.includes("closed")) {
     return { error: "That time is outside the studio schedule. Choose another opening.", status: 400 };
   }
+  if (error.message?.includes("service unavailable")) {
+    return { error: "That service is no longer available for rescheduling. Contact the studio for help.", status: 400 };
+  }
   if (error.message?.includes("not found") || error.message?.includes("terminal")) {
     return { error: "That appointment can no longer be changed.", status: 400 };
   }

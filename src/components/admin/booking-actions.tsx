@@ -11,10 +11,11 @@ const transitions: Record<string, string[]> = {
   cancelled: [],
 };
 
-export function AdminBookingActions({ bookingId, status }: { bookingId: string; status: string }) {
+export function AdminBookingActions({ bookingId, status, initialNotes }: { bookingId: string; status: string; initialNotes?: string }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [value, setValue] = useState(status);
+  const [notes, setNotes] = useState(initialNotes ?? "");
   const [error, setError] = useState<string | null>(null);
   const options = [status, ...(transitions[status] ?? [])];
 
@@ -25,7 +26,7 @@ export function AdminBookingActions({ bookingId, status }: { bookingId: string; 
       const response = await fetch("/api/admin/bookings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ booking_id: bookingId, status: value }),
+        body: JSON.stringify({ booking_id: bookingId, status: value, ...(initialNotes !== undefined ? { admin_notes: notes } : {}) }),
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) {
@@ -58,11 +59,17 @@ export function AdminBookingActions({ bookingId, status }: { bookingId: string; 
       <button
         type="button"
         onClick={update}
-        disabled={busy || value === status || !transitions[status]?.includes(value)}
+        disabled={busy || (value === status && (initialNotes === undefined || notes === (initialNotes ?? ""))) || (value !== status && !transitions[status]?.includes(value))}
         className="action-primary px-3 py-2 text-xs disabled:opacity-40"
       >
         {busy ? "…" : "Save"}
       </button>
+      {initialNotes !== undefined && (
+        <label className="basis-full text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
+          Private staff note
+          <textarea value={notes} onChange={(event) => setNotes(event.target.value)} maxLength={2000} rows={4} placeholder="Only staff can see this note" className="field mt-2 font-normal normal-case tracking-normal" />
+        </label>
+      )}
       {error && <span className="text-xs text-rose-600">{error}</span>}
     </div>
   );

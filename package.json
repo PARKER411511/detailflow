@@ -9,7 +9,10 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.mjs",
-    "verify:database": "node scripts/verify-database.mjs"
+    "verify:database": "node scripts/verify-database.mjs",
+    "verify:hosted": "node scripts/verify-hosted.mjs",
+    "configcheck": "node scripts/configcheck.mjs",
+    "configcheck:strict": "node scripts/configcheck.mjs --strict"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

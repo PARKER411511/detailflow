@@ -28,7 +28,7 @@ export default async function AdminBookingDetail({ params }: { params: Promise<{
             <h1>{booking.service_name}</h1>
             <p className="dashboard-subtitle">{formatDate(booking.starts_at, studioTimezone)} · {booking.customer_email || "No customer email"}</p>
           </div>
-          <div className="admin-detail-actions"><StatusBadge status={booking.status} /><AdminBookingActions bookingId={booking.id} status={booking.status} /></div>
+          <div className="admin-detail-actions"><StatusBadge status={booking.status} /><AdminBookingActions bookingId={booking.id} status={booking.status} initialNotes={booking.admin_notes ?? ""} /></div>
         </div>
         <div className="booking-detail-layout admin-detail-layout">
           <section className="dashboard-panel" aria-labelledby="admin-booking-summary">

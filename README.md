@@ -10,33 +10,33 @@ copy .env.example .env.local
 npm run dev -- --port 3100
 ```
 
-Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local`. These are safe for the browser when used with the policies in the migration. Keep `SUPABASE_SERVICE_ROLE_KEY` server-only and use it only for provisioning or integration checks.
+Set `NEXT_PUBLIC_SUPABASE_URL` and the current `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in `.env.local`. Existing projects may use `NEXT_PUBLIC_SUPABASE_ANON_KEY`; the app accepts it as a backwards-compatible fallback. These public keys are safe for the browser when used with the policies in the migration. Keep `SUPABASE_SERVICE_ROLE_KEY` server-only and use it only for explicitly configured provisioning or integration checks. Run `npm run configcheck` to validate `.env.local` and shell values without printing key contents; use `npm run configcheck:strict` in CI.
 
-## Supabase setup
+### Create and connect a Supabase project
 
-Install the Supabase CLI, link a project from this repository (the committed `supabase/config.toml` already provides the local project configuration), and apply the versioned migration:
+1. Create a new Supabase project at [supabase.com/dashboard](https://supabase.com/dashboard), choose a database password, and wait for the project to finish provisioning.
+2. In Project Settings → Connect, copy the Project URL and Publishable key into `.env.local` as `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
+3. Install the Supabase CLI, run `supabase login`, then link this directory with `supabase link --project-ref YOUR_PROJECT_REF`.
+4. Apply every committed migration with `supabase db push`. Migrations are additive and are applied in filename order.
+5. Run `npm run configcheck`, start the app with `npm run dev -- --port 3100`, and verify the public service list and sign-in page before provisioning an operator.
 
-```bash
-supabase login
-supabase link --project-ref YOUR_PROJECT_REF
-supabase db push
-```
+For Vercel, add the same `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` values under Project Settings → Environment Variables for Preview and Production. Add `SUPABASE_SERVICE_ROLE_KEY` only to a server-side automation that explicitly needs it; the web app does not require it.
 
-For a new checkout without the committed Supabase directory, run `supabase init` once before linking.
+## Supabase database and Auth setup
+
+The committed `supabase/config.toml` provides the local project configuration. If you are working from a checkout without the `supabase` directory, run `supabase init` once before linking.
 
 The migration creates services, a configurable `America/New_York` studio timezone, Tue–Sat 08:00–18:00 opening hours, a 60-day booking horizon, 30-minute starts, 24-hour customer cancellation/reschedule cutoff, one active bay, RLS, and RPC-only booking/blocking mutations. Server timestamps are `timestamptz`; local display and opening-hour checks use `business_settings.timezone`.
 
-Create an Auth user through Supabase Auth, then provision that user as an admin from the SQL editor. This is intentionally separate from profiles and cannot be changed by a customer:
+Create and verify an Auth user through Supabase Auth, then provision that exact user as an admin from the SQL editor. This is intentionally separate from profiles and cannot be changed by a customer. The repeatable script fails when the email does not already exist and verifies the inserted membership:
 
 ```sql
-insert into public.admin_members (user_id, note)
-select id, 'Studio operator'
-from auth.users
-where email = 'your-admin@example.com'
-on conflict (user_id) do nothing;
+-- Replace the placeholder, then run supabase/provision-admin.sql.
 ```
 
-Configure the Supabase Auth Site URL to your local or deployed origin and add callback patterns that allow the emitted `?next=` query, for example `http://localhost:3100/auth/callback**` and `https://YOUR_DOMAIN/auth/callback**`. Email confirmation and password-reset links use the same callback. The callback only accepts same-origin internal paths.
+Never add an admin membership from a browser request or by trusting user metadata. To remove an operator, delete its row from `public.admin_members` in the SQL editor after checking the email.
+
+Configure the Supabase Auth Site URL to your local or deployed origin and add these Redirect URLs: `http://localhost:3100/auth/callback` and `https://YOUR_DOMAIN/auth/callback`. The emitted `?next=` query is accepted on those callback paths; if your dashboard requires a pattern, use `http://localhost:3100/auth/callback*` and `https://YOUR_DOMAIN/auth/callback*`. Email confirmation and password-reset links use the same callback. The callback only accepts same-origin internal paths.
 
 The default studio timezone is `America/New_York`. Change `public.business_settings.timezone` with an admin migration or SQL editor when the studio moves; all server-side opening-hour validation and customer/admin display read that value. Local admin block inputs are interpreted in that zone. Spring-forward nonexistent wall times are rejected, and repeated fall-back times use the earlier matching instant.
 
@@ -57,7 +57,11 @@ npm run lint
 npm run build
 ```
 
-The tests exercise the real timezone conversion helper and the booking rules through the database harness. `scripts/verify-database.mjs` is a PGlite-backed integration harness for the migration, RLS, RPCs, exclusion constraint, configured opening times, and customer/admin isolation; run `npm run verify:database`. Hosted Supabase credentials are still required to verify email flows and production Auth behavior. With no credentials, the live integration remains unconfigured by design; the UI reports that state instead of fabricating slots or persistence. After credentials are available, also exercise two simultaneous `create_booking` calls for the same opening and confirm one succeeds while the GiST exclusion constraint rejects the other.
+The tests exercise the real timezone conversion helper and the booking rules through the database harness. `scripts/verify-database.mjs` loads every committed migration in sorted order and verifies RLS, RPC authorization, dashboard aggregates, staff notes, exclusion constraints, configured opening times, and customer/admin isolation; run `npm run verify:database`. Hosted Supabase credentials are still required to verify email flows and production Auth behavior. With no credentials, the live integration remains unconfigured by design; the UI reports that state instead of fabricating slots or persistence. After credentials are available, also exercise two simultaneous `create_booking` calls for the same opening and confirm one succeeds while the GiST exclusion constraint rejects the other.
+
+The optional `supabase/seed.example.sql` creates only fictional appointments for two Auth users you deliberately created first. Use it only in a disposable project. The repository does not create demo accounts, passwords, or hosted data automatically.
+
+When a disposable hosted project and two existing test accounts are available, the read-only hosted check can be run with `npm run verify:hosted` after setting `DETAILFLOW_TEST_CUSTOMER_EMAIL`, `DETAILFLOW_TEST_CUSTOMER_PASSWORD`, `DETAILFLOW_TEST_ADMIN_EMAIL`, and `DETAILFLOW_TEST_ADMIN_PASSWORD`. It signs in only; it never creates accounts or bookings, never provisions admin access, and never prints tokens or keys. With those variables absent it reports that hosted verification was skipped.
 
 ## Routes
 
@@ -65,4 +69,4 @@ Public: `/`, `/services`, `/service/[slug]`, `/gallery`, `/about`, `/contact`, `
 
 Account: `/login`, `/account`, `/account/bookings/[id]`, `/booking/confirmation`.
 
-Admin: `/admin` (protected by the database membership table). 132323213
+Admin: `/admin` (protected by the database membership table). The workspace reads live metrics, bookings, services, opening hours, blocked intervals, customer search, and booking history through authenticated RPCs. A configured project with no admin membership shows the protected 403 state; an unconfigured project shows setup instructions.
