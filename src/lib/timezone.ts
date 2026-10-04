@@ -1,3 +1,5 @@
+import { parseIsoTimestampToUtcIso } from "./iso-timestamp";
+
 type WallParts = { year: number; month: number; day: number; hour: number; minute: number; second: number };
 
 const wallFormatterCache = new Map<string, Intl.DateTimeFormat>();
@@ -69,9 +71,7 @@ function offsetAt(instant: Date, timeZone: string) {
 /** Convert a datetime-local wall time; choose the earlier instant on fall-back and reject spring-forward gaps. */
 export function localDateTimeToUtcIso(value: string, timeZone: string) {
   if (value.endsWith("Z") || /[+-]\d{2}:?\d{2}$/.test(value)) {
-    const instant = new Date(value);
-    if (Number.isNaN(instant.getTime())) throw new Error("That date and time is invalid.");
-    return instant.toISOString();
+    return parseIsoTimestampToUtcIso(value);
   }
 
   const local = parseLocal(value);

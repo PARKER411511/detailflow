@@ -1,17 +1,18 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { parseIsoTimestampToUtcIso } from "@/lib/iso-timestamp";
 
 const createSchema = z.object({
   service_slug: z.string().min(1).max(80),
-  starts_at: z.string().datetime(),
+  starts_at: z.string().min(1),
   vehicle: z.string().trim().min(2).max(120),
   notes: z.string().trim().max(1000).optional().default(""),
 });
 const updateSchema = z.object({
   booking_id: z.string().uuid(),
   action: z.enum(["cancel", "reschedule"]),
-  starts_at: z.string().datetime().optional(),
+  starts_at: z.string().min(1).optional(),
 });
 
 async function getAuthedClient() {
@@ -52,9 +53,11 @@ export async function POST(request: Request) {
   try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid request." }, { status: 400 }); }
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Check the service, time, vehicle, and notes." }, { status: 400 });
+  let startsAt: string;
+  try { startsAt = parseIsoTimestampToUtcIso(parsed.data.starts_at); } catch { return NextResponse.json({ error: "Check the service, time, vehicle, and notes." }, { status: 400 }); }
   const { data, error } = await supabase.rpc("create_booking", {
     p_service_slug: parsed.data.service_slug,
-    p_starts_at: parsed.data.starts_at,
+    p_starts_at: startsAt,
     p_vehicle_description: parsed.data.vehicle,
     p_customer_notes: parsed.data.notes,
   });
@@ -74,10 +77,15 @@ export async function PATCH(request: Request) {
   try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid request." }, { status: 400 }); }
   const parsed = updateSchema.safeParse(body);
   if (!parsed.success || (parsed.data.action === "reschedule" && !parsed.data.starts_at)) return NextResponse.json({ error: "Choose a valid update." }, { status: 400 });
+  let startsAt: string | null = null;
+  if (parsed.data.starts_at) {
+    try { startsAt = parseIsoTimestampToUtcIso(parsed.data.starts_at); } catch { return NextResponse.json({ error: "Choose a valid update." }, { status: 400 }); }
+  }
+  if (parsed.data.action === "reschedule" && !startsAt) return NextResponse.json({ error: "Choose a valid update." }, { status: 400 });
   const { data, error } = await supabase.rpc("update_my_booking", {
     p_booking_id: parsed.data.booking_id,
     p_action: parsed.data.action,
-    p_new_starts_at: parsed.data.starts_at ?? null,
+    p_new_starts_at: startsAt,
   });
   if (error) {
     const failure = rpcFailure(error, "We could not update that appointment.");
