@@ -22,6 +22,25 @@ Set `NEXT_PUBLIC_SUPABASE_URL` and the current `NEXT_PUBLIC_SUPABASE_PUBLISHABLE
 
 For Vercel, add the same `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` values under Project Settings → Environment Variables for Preview and Production. Add `SUPABASE_SERVICE_ROLE_KEY` only to a server-side automation that explicitly needs it; the web app does not require it.
 
+#### SQL Editor installation when the Supabase CLI is unavailable
+
+For a brand-new project, run `npm run prepare:database` from the repository root. This generates the ignored local artifact [`work/detailflow-setup.sql`](work/detailflow-setup.sql) from every committed migration in sorted version order. Open Supabase Dashboard → SQL Editor, create a new query, paste that generated file, and run it once. The bundle wraps all committed migrations in one transaction and contains the schema, RLS, triggers, and RPCs. It intentionally creates no Auth users, admin memberships, passwords, demo appointments, or migration-history rows. A successful run should leave the project ready for Auth configuration and the app's public read paths.
+
+The SQL Editor does not update the CLI's `supabase_migrations.schema_migrations` tracking table. Before using `supabase db push` later, link the project and inspect `supabase migration list`. If the three migration versions below show as unapplied while the schema is already installed, mark only those exact versions as applied with the CLI's history repair command:
+
+```bash
+supabase login
+supabase link --project-ref YOUR_PROJECT_REF
+supabase migration list
+supabase migration repair --status applied 202610010001
+supabase migration repair --status applied 202610040001
+supabase migration repair --status applied 202610040002
+```
+
+`migration repair` updates migration metadata only; it does not execute or undo SQL. Do not insert rows directly into `supabase_migrations.schema_migrations` and do not run `supabase db push` until the list is reconciled. After repair, keep future schema changes in the committed migration files and use `supabase db push --dry-run` before applying them.
+
+After the schema is installed, the controlled setup verification [`supabase/tests/hosted-verification.sql`](supabase/tests/hosted-verification.sql) exercises hosted RLS, RPC authorization, stored service pricing/duration, overlap protection, admin confirmation, and reschedule/cancellation release. It creates temporary fixed `@example.invalid` fixtures with no passwords inside one transaction, ends with `ROLLBACK`, and prints PASS notices plus read-only zero-row counts after rollback. Run it in a Supabase project you control after applying the migrations; it does not create Auth API accounts or provision a real admin.
+
 ## Supabase database and Auth setup
 
 The committed `supabase/config.toml` provides the local project configuration. If you are working from a checkout without the `supabase` directory, run `supabase init` once before linking.
@@ -36,7 +55,7 @@ Create and verify an Auth user through Supabase Auth, then provision that exact 
 
 Never add an admin membership from a browser request or by trusting user metadata. To remove an operator, delete its row from `public.admin_members` in the SQL editor after checking the email.
 
-Configure the Supabase Auth Site URL to your local or deployed origin and add these Redirect URLs: `http://localhost:3100/auth/callback` and `https://YOUR_DOMAIN/auth/callback`. The emitted `?next=` query is accepted on those callback paths; if your dashboard requires a pattern, use `http://localhost:3100/auth/callback*` and `https://YOUR_DOMAIN/auth/callback*`. Email confirmation and password-reset links use the same callback. The callback only accepts same-origin internal paths.
+Configure the Supabase Auth Site URL to the deployed HTTPS origin in Supabase Dashboard. The current project Site URL is `https://detailflow-zeta-liart.vercel.app`, with Redirect URLs `https://detailflow-zeta-liart.vercel.app/auth/callback**` and `http://localhost:3100/auth/callback**` for local development. For another deployment, replace the hostname with its HTTPS origin and keep the `/auth/callback**` suffix. The `**` suffix accepts the callback query string produced by Supabase Auth while keeping the path fixed. Email confirmation and password-reset links use the same callback. The callback only accepts same-origin internal paths.
 
 The default studio timezone is `America/New_York`. Change `public.business_settings.timezone` with an admin migration or SQL editor when the studio moves; all server-side opening-hour validation and customer/admin display read that value. Local admin block inputs are interpreted in that zone. Spring-forward nonexistent wall times are rejected, and repeated fall-back times use the earlier matching instant.
 

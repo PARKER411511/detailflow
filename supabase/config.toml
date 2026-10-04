@@ -6,7 +6,7 @@ major_version = 15
 [auth]
 enabled = true
 site_url = "http://localhost:3100"
-additional_redirect_urls = ["http://localhost:3100/auth/callback"]
+additional_redirect_urls = ["http://localhost:3100/auth/callback**"]
 
 [auth.email]
 enable_signup = true

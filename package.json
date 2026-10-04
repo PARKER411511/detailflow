@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.mjs",
     "verify:database": "node scripts/verify-database.mjs",
+    "prepare:database": "node scripts/prepare-database-bundle.mjs",
     "verify:hosted": "node scripts/verify-hosted.mjs",
     "configcheck": "node scripts/configcheck.mjs",
     "configcheck:strict": "node scripts/configcheck.mjs --strict"
