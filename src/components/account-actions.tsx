@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { DatePicker } from "@/components/dashboard/controls";
+import { formatTimeZoneLabel } from "@/lib/format";
 export function AccountActions({ bookingId }: { bookingId: string }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -122,18 +124,8 @@ export function RescheduleForm({
   return (
     <div className="mt-5 rounded-md border border-blue-100 bg-blue-50 p-5">
       <p className="text-sm font-semibold text-[#0b1739]">Reschedule</p>
-      <label className="mt-3 block text-xs font-semibold text-slate-600">
-        New date
-        <input
-          type="date"
-          min={dateString(minDate)}
-          max={dateString(maxDate)}
-          value={date}
-          onChange={(event) => find(event.target.value)}
-          className="field mt-2 font-normal"
-        />
-      </label>
-      <p className="mt-2 text-xs text-slate-500">Times shown in {studioTimezone}.</p>
+      <div className="mt-3"><DatePicker label="New date" min={dateString(minDate)} max={dateString(maxDate)} value={date} onChange={(value) => void find(value)} /></div>
+      <p className="mt-2 text-xs text-slate-500">Times shown in {formatTimeZoneLabel(studioTimezone)}.</p>
       {slots.length > 0 && (
         <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
           {slots.map((slot) => (

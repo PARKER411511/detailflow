@@ -26,7 +26,7 @@ For Vercel, add the same `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PU
 
 For a brand-new project, run `npm run prepare:database` from the repository root. This generates the ignored local artifact [`work/detailflow-setup.sql`](work/detailflow-setup.sql) from every committed migration in sorted version order. Open Supabase Dashboard → SQL Editor, create a new query, paste that generated file, and run it once. The bundle wraps all committed migrations in one transaction and contains the schema, RLS, triggers, and RPCs. It intentionally creates no Auth users, admin memberships, passwords, demo appointments, or migration-history rows. A successful run should leave the project ready for Auth configuration and the app's public read paths.
 
-The SQL Editor does not update the CLI's `supabase_migrations.schema_migrations` tracking table. Before using `supabase db push` later, link the project and inspect `supabase migration list`. If the three migration versions below show as unapplied while the schema is already installed, mark only those exact versions as applied with the CLI's history repair command:
+The SQL Editor does not update the CLI's `supabase_migrations.schema_migrations` tracking table. Before using `supabase db push` later, link the project and inspect `supabase migration list`. If the migration versions below show as unapplied while the schema is already installed, mark only those exact versions as applied with the CLI's history repair command:
 
 ```bash
 supabase login
@@ -35,11 +35,15 @@ supabase migration list
 supabase migration repair --status applied 202610010001
 supabase migration repair --status applied 202610040001
 supabase migration repair --status applied 202610040002
+supabase migration repair --status applied 202610040003
+supabase migration repair --status applied 202610040004
 ```
 
 `migration repair` updates migration metadata only; it does not execute or undo SQL. Do not insert rows directly into `supabase_migrations.schema_migrations` and do not run `supabase db push` until the list is reconciled. After repair, keep future schema changes in the committed migration files and use `supabase db push --dry-run` before applying them.
 
 After the schema is installed, the controlled setup verification [`supabase/tests/hosted-verification.sql`](supabase/tests/hosted-verification.sql) exercises hosted RLS, RPC authorization, stored service pricing/duration, overlap protection, admin confirmation, and reschedule/cancellation release. It creates temporary fixed `@example.invalid` fixtures with no passwords inside one transaction, ends with `ROLLBACK`, and prints PASS notices plus read-only zero-row counts after rollback. Run it in a Supabase project you control after applying the migrations; it does not create Auth API accounts or provision a real admin.
+
+For an existing project that already applied `202610040003`, apply the corrective column-grant migration [`supabase/migrations/202610040004_detailflow_dashboard_grants.sql`](supabase/migrations/202610040004_detailflow_dashboard_grants.sql) from the SQL editor. The corresponding ignored rollout snippet is [`work/detailflow-dashboard-grants-rollout.sql`](work/detailflow-dashboard-grants-rollout.sql). The dashboard verification harness is [`supabase/tests/dashboard-verification.sql`](supabase/tests/dashboard-verification.sql); it is transactional and rolls back its three Auth fixtures, voucher, and bookings. Its PGlite counterpart verifies the application migration and rules locally, but PGlite uses one connection, so a true simultaneous multi-connection voucher race still requires hosted PostgreSQL testing.
 
 ## Supabase database and Auth setup
 
@@ -67,6 +71,10 @@ The default studio timezone is `America/New_York`. Change `public.business_setti
 
 Customers read only their own bookings through RLS and call `create_booking` / `update_my_booking` RPCs. The RPCs verify `auth.uid()`, retrieve the service price and duration on the server, enforce opening hours, horizon, slot alignment, cutoff, ownership, and valid status. Admin RPCs call `is_admin()` and are separately granted. The direct booking select grant excludes `admin_notes`; customer update RPCs return a safe projection.
 
+Customer vouchers are assigned by an admin RPC and read through the customer's own RLS wallet. Fixed-dollar values are stored in cents; percentage values are whole numbers from 1 to 100. A voucher may optionally target one service, cannot be stacked, and can attach to only one active booking. The booking RPC locks the voucher row, derives the discount from the stored service price, clamps the net total at zero, and records base, discount, net, and voucher association on the booking. Cancellation releases an active voucher; completing the visit marks it redeemed. Expiry is entered as a calendar date and stored as the next midnight exclusive in the configured business timezone, so the selected date remains valid through its local end of day.
+
+Service photos use the public `service-images` Supabase Storage bucket. Only admins can write, update, or delete objects; uploads are JPEG, PNG, or WebP raster files up to 5 MB. Services store validated local asset paths or `services/<object-key>` values, and public rendering derives the exact configured Supabase origin instead of accepting arbitrary external URLs.
+
 ## Checks
 
 ```bash
@@ -86,6 +94,6 @@ When a disposable hosted project and two existing test accounts are available, t
 
 Public: `/`, `/services`, `/service/[slug]`, `/gallery`, `/about`, `/contact`, `/booking`.
 
-Account: `/login`, `/account`, `/account/bookings/[id]`, `/booking/confirmation`.
+Account: `/login`, `/account`, `/account/bookings`, `/account/bookings/[id]`, `/account/vouchers`, `/account/profile`, `/account/settings`, `/account/reset`, `/booking/confirmation`. A normal sign-in returns to `/`; explicit safe booking-resume and protected-route `next` paths are preserved. The public header profile disclosure opens the customer dashboard and includes the studio workspace only for a database-authorized admin.
 
-Admin: `/admin` (protected by the database membership table). The workspace reads live metrics, bookings, services, opening hours, blocked intervals, customer search, and booking history through authenticated RPCs. A configured project with no admin membership shows the protected 403 state; an unconfigured project shows setup instructions.
+Admin: `/admin`, `/admin/bookings`, `/admin/bookings/[id]`, `/admin/customers`, `/admin/vouchers`, `/admin/services`, `/admin/settings` (all protected by the database membership table). Each section checks the signed-in user and `is_admin()` at its own data boundary. The workspace reads live metrics, appointments, services and raster image keys, opening hours, blocked intervals, customer search/history, and vouchers through authenticated RPCs and APIs. A configured project with no admin membership shows the protected 403 state; an unconfigured project shows setup instructions. Authenticated dashboard surfaces use a compact sidebar shell with keyboard-aware custom select and calendar controls; the marketing header/footer remains on public pages.

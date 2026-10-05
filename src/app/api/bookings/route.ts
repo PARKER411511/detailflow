@@ -8,6 +8,7 @@ const createSchema = z.object({
   starts_at: z.string().min(1),
   vehicle: z.string().trim().min(2).max(120),
   notes: z.string().trim().max(1000).optional().default(""),
+  voucher_id: z.string().uuid().nullable().optional(),
 });
 const updateSchema = z.object({
   booking_id: z.string().uuid(),
@@ -39,6 +40,9 @@ function rpcFailure(error: { code?: string; message?: string }, fallback: string
   if (error.message?.includes("service unavailable")) {
     return { error: "That service is no longer available for rescheduling. Contact the studio for help.", status: 400 };
   }
+  if (error.message?.includes("voucher")) {
+    return { error: "That voucher is expired, unavailable, or does not apply to this service. Review your wallet and try again.", status: 400 };
+  }
   if (error.message?.includes("not found") || error.message?.includes("terminal")) {
     return { error: "That appointment can no longer be changed.", status: 400 };
   }
@@ -55,12 +59,20 @@ export async function POST(request: Request) {
   if (!parsed.success) return NextResponse.json({ error: "Check the service, time, vehicle, and notes." }, { status: 400 });
   let startsAt: string;
   try { startsAt = parseIsoTimestampToUtcIso(parsed.data.starts_at); } catch { return NextResponse.json({ error: "Check the service, time, vehicle, and notes." }, { status: 400 }); }
-  const { data, error } = await supabase.rpc("create_booking", {
+  const rpcName = parsed.data.voucher_id ? "create_booking_with_voucher" : "create_booking";
+  const rpcArgs = parsed.data.voucher_id ? {
     p_service_slug: parsed.data.service_slug,
     p_starts_at: startsAt,
     p_vehicle_description: parsed.data.vehicle,
     p_customer_notes: parsed.data.notes,
-  });
+    p_voucher_id: parsed.data.voucher_id,
+  } : {
+    p_service_slug: parsed.data.service_slug,
+    p_starts_at: startsAt,
+    p_vehicle_description: parsed.data.vehicle,
+    p_customer_notes: parsed.data.notes,
+  };
+  const { data, error } = await supabase.rpc(rpcName, rpcArgs);
   if (error) {
     const failure = rpcFailure(error, "We could not create that appointment.");
     return NextResponse.json({ error: failure.error }, { status: failure.status });

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
-function safeInternalPath(value: string | null, origin: string) { if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return "/account"; try { const resolved = new URL(value, origin); return resolved.origin === origin ? `${resolved.pathname}${resolved.search}${resolved.hash}` : "/account"; } catch { return "/account"; } }
+function safeInternalPath(value: string | null, origin: string) { if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return "/"; try { const resolved = new URL(value, origin); return resolved.origin === origin ? `${resolved.pathname}${resolved.search}${resolved.hash}` : "/"; } catch { return "/"; } }
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");

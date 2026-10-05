@@ -5,6 +5,7 @@ import { formatCurrency, formatDate } from "@/lib/format";
 import { AccountActions, RescheduleForm } from "@/components/account-actions";
 import { getStudioSettings } from "@/lib/studio-settings";
 import { StatusBadge } from "@/components/status-badge";
+import { AccountDashboardFrame } from "@/components/account/account-dashboard-frame";
 
 export default async function BookingDetailPage({
   params,
@@ -35,7 +36,7 @@ export default async function BookingDetailPage({
     : (booking.service as { name?: string; slug?: string } | null);
 
   return (
-    <section className="functional-page account-page booking-detail-page">
+    <AccountDashboardFrame><section className="functional-page account-page booking-detail-page">
       <div className="dashboard-shell">
         <Link href="/account" className="dashboard-back-link">← Your account</Link>
         <div className="dashboard-header booking-detail-header">
@@ -73,6 +74,6 @@ export default async function BookingDetailPage({
           </aside>
         </div>
       </div>
-    </section>
+    </section></AccountDashboardFrame>
   );
 }

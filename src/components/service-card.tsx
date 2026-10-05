@@ -43,7 +43,11 @@ type ServiceCardProps = {
 
 export function ServiceCard({ service, featured = false, image, variant = "default", ordinal }: ServiceCardProps) {
   if (variant === "compact") {
-    const compactImage = compactImages[service.slug] ?? {
+    const compactImage = service.imageUrl ? {
+      src: service.imageUrl,
+      alt: service.imageAlt || `${service.name} in the DetailFlow studio`,
+      position: "center center",
+    } : compactImages[service.slug] ?? {
       src: "/images/detailflow-dark-studio-v1.png",
       alt: `${service.name} in the DetailFlow studio`,
       position: "center center",
@@ -81,7 +85,7 @@ export function ServiceCard({ service, featured = false, image, variant = "defau
     <article className={`group border-t-2 border-slate-300 ${featured ? "border-t-[var(--blue)]" : ""}`}>
       <Link href={`/service/${service.slug}`} className="block">
         <div className="image-frame aspect-[4/3] corner-cut">
-          <Image src={image ?? "/images/detailflow-hero.png"} alt={`${service.name} illustrative studio image`} fill sizes="(max-width: 1024px) 100vw, 33vw" className="object-cover" />
+          <Image src={image ?? service.imageUrl ?? "/images/detailflow-hero.png"} alt={service.imageAlt || `${service.name} illustrative studio image`} fill sizes="(max-width: 1024px) 100vw, 33vw" className="object-cover" />
           <span className="absolute left-4 top-4 bg-[var(--warm)]/95 px-3 py-2 tech-label text-[var(--ink)]">{imageLabels[service.slug] ?? service.eyebrow}</span>
         </div>
         <div className="py-6">

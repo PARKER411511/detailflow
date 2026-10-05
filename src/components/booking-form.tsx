@@ -4,8 +4,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Service } from "@/data/services";
 import { formatCurrency, formatTimeZoneLabel } from "@/lib/format";
+import { SelectMenu, DatePicker } from "@/components/dashboard/controls";
 
 type Slot = { starts_at: string; ends_at: string; label: string };
+type Voucher = { id: string; code: string; discount_kind: "fixed" | "percent"; discount_value: number; expires_at: string; status: string; redeemed_at: string | null; reserved?: boolean; service: { slug?: string; name?: string } | Array<{ slug?: string; name?: string }> | null };
 export function BookingForm({
   services,
   initialService,
@@ -32,6 +34,8 @@ export function BookingForm({
   const [vehicleMake, setVehicleMake] = useState("");
   const [vehicleModel, setVehicleModel] = useState("");
   const [notes, setNotes] = useState("");
+  const [vouchers, setVouchers] = useState<Voucher[]>([]);
+  const [voucherId, setVoucherId] = useState("none");
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<{
@@ -44,6 +48,13 @@ export function BookingForm({
     () => services.find((item) => item.slug === serviceSlug),
     [serviceSlug, services],
   );
+  const usableVouchers = vouchers.filter((voucher) => {
+    const service = Array.isArray(voucher.service) ? voucher.service[0] : voucher.service;
+    return voucher.status === "active" && !voucher.redeemed_at && !voucher.reserved && new Date(voucher.expires_at).getTime() > new Date().getTime() && (!service?.slug || service.slug === selectedService?.slug);
+  });
+  const selectedVoucher = usableVouchers.find((voucher) => voucher.id === voucherId);
+  const voucherDiscount = selectedVoucher && selectedService ? selectedVoucher.discount_kind === "fixed" ? Math.min(selectedService.price, selectedVoucher.discount_value / 100) : selectedService.price * selectedVoucher.discount_value / 100 : 0;
+  const reviewPrice = selectedService ? selectedService.price - voucherDiscount : 0;
   const vehicle = [vehicleYear.trim(), vehicleMake.trim(), vehicleModel.trim()].filter(Boolean).join(" ");
   const minDate = new Date();
   minDate.setDate(minDate.getDate() + 1);
@@ -166,6 +177,12 @@ export function BookingForm({
     }
   }, [services]);
   /* eslint-enable react-hooks/set-state-in-effect */
+  /* eslint-disable react-hooks/set-state-in-effect -- wallet state follows the authenticated browser session. */
+  useEffect(() => {
+    if (!userEmail || !configured) { setVouchers([]); setVoucherId("none"); return; }
+    void fetch("/api/vouchers", { cache: "no-store" }).then(async (response) => response.ok ? response.json() : { vouchers: [] }).then((body: { vouchers?: Voucher[] }) => { const nextVouchers = body.vouchers ?? []; setVouchers(nextVouchers); setVoucherId("none"); }).catch(() => { setVouchers([]); setVoucherId("none"); });
+  }, [configured, userEmail]);
+  /* eslint-enable react-hooks/set-state-in-effect */
   function saveDraft() {
     try {
       window.sessionStorage.setItem(
@@ -204,6 +221,7 @@ export function BookingForm({
           starts_at: selectedSlot,
           vehicle,
           notes,
+          voucher_id: voucherId === "none" ? null : voucherId,
         }),
       });
       const body = await response.json();
@@ -265,6 +283,8 @@ export function BookingForm({
                   setDate("");
                   setSlots([]);
                   setSelectedSlot("");
+                  setVoucherId("none");
+                  setReviewing(false);
                 }}
                 className="sr-only"
               />
@@ -297,18 +317,7 @@ export function BookingForm({
           </div>
           <span className="text-xs text-slate-500">2 / 3</span>
         </div>
-        <label className="block text-sm font-medium text-slate-700">
-          Preferred date
-          <input
-            type="date"
-            required
-            min={dateString(minDate)}
-            max={dateString(maxDate)}
-            value={date}
-            onChange={(event) => loadSlots(event.target.value)}
-            className="mt-2 field"
-          />
-        </label>
+          <DatePicker label="Preferred date" value={date} onChange={(value) => void loadSlots(value)} min={dateString(minDate)} max={dateString(maxDate)} />
         {!configured && (
           <p className="mt-3 text-xs leading-5 text-slate-500">
             Appointments unavailable in this preview; date and time selection is shown for layout only.
@@ -353,6 +362,7 @@ export function BookingForm({
           </div>
         )}
       </div>
+      {usableVouchers.length ? <div className="dashboard-booking-voucher"><SelectMenu label="Voucher" value={selectedVoucher ? voucherId : "none"} onChange={setVoucherId} options={[{ value: "none", label: "No voucher" }, ...usableVouchers.map((voucher) => ({ value: voucher.id, label: `${voucher.code} · ${voucher.discount_kind === "fixed" ? formatCurrency(voucher.discount_value / 100) : `${voucher.discount_value}%`} off` }))]} hint="Only active, eligible vouchers that are not already attached to an appointment appear here." />{selectedVoucher ? <p className="mt-2 text-xs text-blue-800">The studio will revalidate this voucher and its service eligibility when you confirm.</p> : null}</div> : null}
       <div>
         <div className="mb-4 flex items-center justify-between">
           <div>
@@ -423,8 +433,7 @@ export function BookingForm({
             <div>
               <p className="text-xs text-slate-500">Service</p>
               <p className="mt-1 font-semibold text-[#0b1739]">
-                {selectedService?.name} ·{" "}
-                {selectedService ? formatCurrency(selectedService.price) : ""}
+                {selectedService?.name} · {selectedService && selectedVoucher ? <><span className="line-through text-slate-400">{formatCurrency(selectedService.price)}</span> {formatCurrency(reviewPrice)}</> : selectedService ? formatCurrency(selectedService.price) : ""}
               </p>
             </div>
             <div>
@@ -443,6 +452,7 @@ export function BookingForm({
               <p className="text-xs text-slate-500">Vehicle</p>
               <p className="mt-1 font-semibold text-[#0b1739]">{vehicle}</p>
             </div>
+            {selectedVoucher ? <div><p className="text-xs text-slate-500">Voucher</p><p className="mt-1 font-semibold text-[#0b1739]">{selectedVoucher.code} · {selectedVoucher.discount_kind === "fixed" ? formatCurrency(selectedVoucher.discount_value / 100) : `${selectedVoucher.discount_value}%`} off</p></div> : null}
           </div>
           <button
             type="button"

@@ -1,0 +1,5 @@
+import type { Metadata } from "next";
+import { AdminWorkspace } from "@/components/admin/admin-workspace";
+import { getAdminContext } from "@/lib/admin-page";
+export const metadata: Metadata = { title: "Customers" };
+export default async function AdminCustomersPage() { const { supabase, allowed } = await getAdminContext("/admin/customers"); if (!supabase) return <section className="dashboard-view"><div className="dashboard-empty-state"><h1>Customers</h1><p>Connect the studio database to view customer history.</p></div></section>; if (!allowed) return <section className="dashboard-view"><div className="dashboard-empty-state"><h1>Admin access required.</h1></div></section>; return <section className="dashboard-view"><div className="dashboard-view-header"><div><p className="dashboard-kicker">Registered accounts</p><h1>Customers</h1><p className="dashboard-subtitle">Search every registered account and open its appointment history.</p></div></div><AdminWorkspace initialBookings={[]} initialServices={[]} studioTimezone="America/New_York" initialTab="customers" /></section>; }

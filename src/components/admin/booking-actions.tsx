@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { SelectMenu } from "@/components/dashboard/controls";
 
 const transitions: Record<string, string[]> = {
   requested: ["confirmed", "cancelled"],
@@ -18,6 +19,7 @@ export function AdminBookingActions({ bookingId, status, initialNotes }: { booki
   const [notes, setNotes] = useState(initialNotes ?? "");
   const [error, setError] = useState<string | null>(null);
   const options = [status, ...(transitions[status] ?? [])];
+  const statusOptions = options.map((option) => ({ value: option, label: option.replaceAll("_", " ") }));
 
   async function update() {
     setBusy(true);
@@ -43,19 +45,16 @@ export function AdminBookingActions({ bookingId, status, initialNotes }: { booki
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <select
-        value={value}
-        onChange={(event) => setValue(event.target.value)}
-        disabled={!options.length || busy}
-        aria-label={`Status for booking ${bookingId}`}
-        className="field py-2 text-xs capitalize"
-      >
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option.replace("_", " ")}
-          </option>
-        ))}
-      </select>
+      <div className="min-w-[11rem]">
+        <SelectMenu
+          label="Status"
+          ariaLabel={`Status for booking ${bookingId}`}
+          value={value}
+          onChange={setValue}
+          options={statusOptions}
+          disabled={busy || !(transitions[status]?.length ?? 0)}
+        />
+      </div>
       <button
         type="button"
         onClick={update}

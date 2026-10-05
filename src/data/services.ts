@@ -12,6 +12,8 @@ export type Service = {
   stages: string[];
   outcome: string;
   care: string;
+  imageUrl?: string | null;
+  imageAlt?: string;
 };
 
 const presentation: Record<string, Omit<Service, "slug" | "name" | "eyebrow" | "description" | "details" | "duration" | "price" | "accent">> = {

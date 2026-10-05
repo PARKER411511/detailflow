@@ -30,7 +30,7 @@ export function AuthForm() {
     !rawNext.startsWith("//") &&
     !rawNext.includes("\\")
       ? rawNext
-      : "/account";
+      : "/";
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

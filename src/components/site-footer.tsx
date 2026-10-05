@@ -14,7 +14,7 @@ export function SiteFooter() {
         </div>
         <div className="site-footer-groups">
           <div className="site-footer-group"><p>Explore</p><nav aria-label="Explore footer links"><Link href="/services">Services</Link><Link href="/gallery">Work</Link><Link href="/about">Studio</Link><Link href="/contact">Contact</Link></nav></div>
-          <div className="site-footer-group"><p>Account</p><nav aria-label="Account footer links"><Link href="/booking">Book a detail</Link><Link href="/login?next=/account">Sign in</Link><Link href="/account">Your appointments</Link></nav></div>
+          <div className="site-footer-group"><p>Account</p><nav aria-label="Account footer links"><Link href="/booking">Book a detail</Link><Link href="/login?next=/">Sign in</Link><Link href="/account">Your appointments</Link></nav></div>
           <div className="site-footer-group site-footer-studio"><p>Studio desk</p><address>19 Mercer Lane<br />Brooklyn, NY 11222<br />Tue—Sat · 08:00—18:00</address><a href="mailto:hello@detailflow.demo">hello@detailflow.demo</a></div>
         </div>
       </div>

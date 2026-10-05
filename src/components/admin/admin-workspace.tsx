@@ -1,8 +1,12 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { AdminBookingActions } from "@/components/admin/booking-actions";
+import { DatePicker, SelectMenu } from "@/components/dashboard/controls";
+import { createClient } from "@/lib/supabase/browser";
+import { getServiceImageUrl } from "@/lib/service-images";
 
 type Booking = {
   id: string;
@@ -15,7 +19,7 @@ type Booking = {
   vehicle_description: string;
 };
 type ServiceRow = {
-  id: string;
+  id: string | null;
   slug: string;
   name: string;
   eyebrow: string;
@@ -25,6 +29,8 @@ type ServiceRow = {
   price_cents: number;
   active: boolean;
   display_order: number;
+  image_url: string | null;
+  image_alt: string;
 };
 type Hour = {
   weekday: number;
@@ -70,6 +76,8 @@ const blankService: Omit<ServiceRow, "id"> = {
   price_cents: 0,
   active: true,
   display_order: 1,
+  image_url: null,
+  image_alt: "",
 };
 
 function studioDateKey(value: Date, timeZone: string) {
@@ -160,16 +168,18 @@ export function AdminWorkspace({
   studioTimezone,
   initialBookingsError,
   initialServicesError,
+  initialTab = "bookings",
 }: {
   initialBookings: Booking[];
   initialServices: ServiceRow[];
   studioTimezone: string;
   initialBookingsError?: string;
   initialServicesError?: string;
+  initialTab?: "bookings" | "services" | "schedule" | "customers";
 }) {
-  const [tab, setTab] = useState<
+  const [tab] = useState<
     "bookings" | "services" | "schedule" | "customers"
-  >("bookings");
+  >(initialTab);
   const bookings = initialBookings;
   const [services, setServices] = useState(initialServices);
   const [hours, setHours] = useState<Hour[]>([]);
@@ -309,25 +319,6 @@ export function AdminWorkspace({
     <div className="admin-workspace">
       {initialBookingsError && <p role="alert" className="mt-5 rounded-md bg-rose-50 p-3 text-sm text-rose-800">{initialBookingsError}</p>}
       {initialServicesError && <p role="alert" className="mt-3 rounded-md bg-rose-50 p-3 text-sm text-rose-800">{initialServicesError}</p>}
-      <div className="admin-tabs" aria-label="Admin workspace sections">
-        {(
-          [
-            ["bookings", "Bookings"],
-            ["services", "Services"],
-            ["schedule", "Hours & blocks"],
-            ["customers", "Customers"],
-          ] as const
-        ).map(([value, label]) => (
-          <button
-            type="button"
-            key={value}
-            onClick={() => setTab(value)}
-            className={`admin-tab ${tab === value ? "admin-tab-active" : ""}`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
       {loadingTab && (
         <p role="status" className="mt-5 rounded-md bg-slate-50 p-3 text-sm text-slate-600">
           Loading {loadingTab === "schedule" ? "hours and blocked intervals" : "customers"}…
@@ -443,53 +434,9 @@ function BookingsPanel({
   return (
     <div>
       <div className="mt-6 grid gap-3 md:grid-cols-3">
-        <label className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
-          Date
-          <input
-            type="date"
-            value={filters.date}
-            onChange={(event) =>
-              setFilters({ ...filters, date: event.target.value })
-            }
-            className="field mt-2 font-normal"
-          />
-        </label>
-        <label className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
-          Service
-          <select
-            value={filters.service}
-            onChange={(event) =>
-              setFilters({ ...filters, service: event.target.value })
-            }
-            className="field mt-2 font-normal"
-          >
-            <option value="all">All services</option>
-            {services.map((service) => (
-              <option key={service}>{service}</option>
-            ))}
-          </select>
-        </label>
-        <label className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
-          Status
-          <select
-            value={filters.status}
-            onChange={(event) =>
-              setFilters({ ...filters, status: event.target.value })
-            }
-            className="field mt-2 font-normal capitalize"
-          >
-            <option value="all">All statuses</option>
-            {[
-              "requested",
-              "confirmed",
-              "in_service",
-              "completed",
-              "cancelled",
-            ].map((status) => (
-              <option key={status}>{status}</option>
-            ))}
-          </select>
-        </label>
+        <DatePicker label="Date" value={filters.date} onChange={(date) => setFilters({ ...filters, date })} />
+        <SelectMenu label="Service" value={filters.service} onChange={(service) => setFilters({ ...filters, service })} options={[{ value: "all", label: "All services" }, ...services.map((service) => ({ value: service, label: service }))]} />
+        <SelectMenu label="Status" value={filters.status} onChange={(status) => setFilters({ ...filters, status })} options={[{ value: "all", label: "All statuses" }, ...["requested", "confirmed", "in_service", "completed", "cancelled"].map((status) => ({ value: status, label: status.replace("_", " ") }))]} />
       </div>
       <div className="mt-7 overflow-x-auto">
         <table className="w-full min-w-[760px] text-left text-sm">
@@ -640,6 +587,28 @@ function ServicesPanel({
   saveService: () => void;
   saving: boolean;
 }) {
+  const [uploading, setUploading] = useState(false);
+  async function uploadImage(file: File) {
+    if (!editing) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 5 * 1024 * 1024) {
+      window.alert("Choose a JPEG, PNG, or WebP image up to 5 MB.");
+      return;
+    }
+    setUploading(true);
+    try {
+      const extension = file.type === "image/jpeg" ? "jpg" : file.type === "image/png" ? "png" : "webp";
+      const path = `services/${crypto.randomUUID()}.${extension}`;
+      const supabase = createClient();
+      const { error } = await supabase.storage.from("service-images").upload(path, file, { contentType: file.type, upsert: false });
+      if (error) throw error;
+      setEditing({ ...editing, image_url: path, image_alt: editing.image_alt || `${editing.name} service detail` });
+    } catch {
+      window.alert("The image could not be uploaded. Confirm the file type and admin access, then try again.");
+    } finally {
+      setUploading(false);
+    }
+  }
+  const previewUrl = editing ? getServiceImageUrl(editing.image_url) : null;
   return (
     <div>
       <div className="mt-6 flex items-center justify-between">
@@ -648,7 +617,7 @@ function ServicesPanel({
         </p>
         <button
           type="button"
-          onClick={() => setEditing({ id: "", ...blankService })}
+          onClick={() => setEditing({ id: null, ...blankService })}
           className="action-primary px-4 py-2 text-sm"
         >
           Add service
@@ -707,6 +676,20 @@ function ServicesPanel({
             onChange={(value) => setEditing({ ...editing, details: value })}
             wide
           />
+          <Field
+            label="Image alt text"
+            value={editing.image_alt}
+            onChange={(value) => setEditing({ ...editing, image_alt: value })}
+            wide
+          />
+          <label className="sm:col-span-2 text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
+            Service image
+            <span className="mt-2 flex flex-wrap items-center gap-3">
+              <input type="file" accept="image/jpeg,image/png,image/webp" className="field max-w-full font-normal normal-case tracking-normal" onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadImage(file); }} />
+              <span className="text-xs font-normal normal-case tracking-normal text-slate-500">{uploading ? "Uploading…" : editing.image_url ? "Image ready to save" : "JPEG, PNG, WebP · 5 MB max"}</span>
+            </span>
+            {previewUrl ? <span className="relative mt-3 block aspect-[4/3] max-w-sm overflow-hidden rounded-xl border border-blue-100 bg-white"><Image src={previewUrl} alt={editing.image_alt || `${editing.name} service preview`} fill sizes="(max-width: 640px) 100vw, 24rem" className="object-cover" /></span> : null}
+          </label>
           <label className="flex items-center gap-3 text-sm font-medium text-slate-700">
             <input
               type="checkbox"
@@ -721,7 +704,7 @@ function ServicesPanel({
             <button
               type="button"
               onClick={saveService}
-              disabled={saving}
+              disabled={saving || uploading}
               className="action-primary px-5 py-3 text-sm"
             >
               {saving ? "Saving…" : "Save service"}
@@ -823,6 +806,10 @@ function SchedulePanel({
 }) {
   const [blockBusy, setBlockBusy] = useState<string | null>(null);
   const [blockError, setBlockError] = useState<string | null>(null);
+  function blockDate(value: string) { return value.split("T")[0] ?? ""; }
+  function blockTime(value: string) { return value.split("T")[1] ?? "08:00"; }
+  function setBlockDate(field: "starts_at" | "ends_at", date: string) { setBlockForm({ ...blockForm, [field]: date ? `${date}T${blockTime(blockForm[field])}` : "" }); }
+  function setBlockTime(field: "starts_at" | "ends_at", time: string) { setBlockForm({ ...blockForm, [field]: blockDate(blockForm[field]) ? `${blockDate(blockForm[field])}T${time}` : "" }); }
   return (
     <div>
       <p className="mt-6 text-sm text-slate-500">
@@ -916,30 +903,8 @@ function SchedulePanel({
           <p className="text-xs font-bold uppercase tracking-[.18em] text-blue-600 sm:col-span-3">
             {blockForm.id ? "Edit blocked interval" : "Add blocked interval"}
           </p>
-          <label className="text-xs font-semibold text-slate-500">
-            Starts
-            <input
-              required
-              type="datetime-local"
-              value={blockForm.starts_at}
-              onChange={(event) =>
-                setBlockForm({ ...blockForm, starts_at: event.target.value })
-              }
-              className="field mt-2 font-normal"
-            />
-          </label>
-          <label className="text-xs font-semibold text-slate-500">
-            Ends
-            <input
-              required
-              type="datetime-local"
-              value={blockForm.ends_at}
-              onChange={(event) =>
-                setBlockForm({ ...blockForm, ends_at: event.target.value })
-              }
-              className="field mt-2 font-normal"
-            />
-          </label>
+          <div className="grid gap-2"><DatePicker label="Starts" value={blockDate(blockForm.starts_at)} min={studioDateKey(new Date(), studioTimezone)} onChange={(date) => setBlockDate("starts_at", date)} /><label className="dashboard-field-label">Start time<input required type="time" value={blockTime(blockForm.starts_at)} onChange={(event) => setBlockTime("starts_at", event.target.value)} className="field" /></label></div>
+          <div className="grid gap-2"><DatePicker label="Ends" value={blockDate(blockForm.ends_at)} min={studioDateKey(new Date(), studioTimezone)} onChange={(date) => setBlockDate("ends_at", date)} /><label className="dashboard-field-label">End time<input required type="time" value={blockTime(blockForm.ends_at)} onChange={(event) => setBlockTime("ends_at", event.target.value)} className="field" /></label></div>
           <label className="text-xs font-semibold text-slate-500">
             Reason
             <input
