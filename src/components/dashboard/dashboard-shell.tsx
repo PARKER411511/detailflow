@@ -1,20 +1,21 @@
 import Link from "next/link";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
+import { DashboardIcon } from "@/components/dashboard/dashboard-icon";
 
 const customerNav = [
-  ["Overview", "/account"],
-  ["Bookings", "/account/bookings"],
-  ["Vouchers", "/account/vouchers"],
-  ["Profile", "/account/profile"],
-  ["Settings", "/account/settings"],
+  ["Overview", "/account", "overview"],
+  ["Bookings", "/account/bookings", "calendar"],
+  ["Vouchers", "/account/vouchers", "ticket"],
+  ["Profile", "/account/profile", "profile"],
+  ["Settings", "/account/settings", "settings"],
 ] as const;
 const adminNav = [
-  ["Overview", "/admin"],
-  ["Appointments", "/admin/bookings"],
-  ["Customers", "/admin/customers"],
-  ["Vouchers", "/admin/vouchers"],
-  ["Services", "/admin/services"],
-  ["Studio settings", "/admin/settings"],
+  ["Overview", "/admin", "overview"],
+  ["Appointments", "/admin/bookings", "calendar"],
+  ["Customers", "/admin/customers", "users"],
+  ["Vouchers", "/admin/vouchers", "ticket"],
+  ["Services", "/admin/services", "services"],
+  ["Studio settings", "/admin/settings", "settings"],
 ] as const;
 
 function BrandMark() {
@@ -29,8 +30,8 @@ export function DashboardShell({ children, role, email, fullName }: { children: 
       <Link href="/" className="dashboard-brand" aria-label="Return to DetailFlow home"><BrandMark /><span><strong>DETAILFLOW</strong><small>{role === "admin" ? "Studio desk" : "Customer desk"}</small></span></Link>
       <div className="dashboard-sidebar-user"><span className="dashboard-avatar" aria-hidden="true">{displayName.slice(0, 1).toUpperCase()}</span><span><strong>{displayName}</strong><small>{role === "admin" ? "Admin workspace" : "Customer account"}</small></span></div>
       <DashboardNav items={nav} />
-      <div className="dashboard-sidebar-bottom"><Link href="/" className="dashboard-return">← Return to website</Link><form action="/auth/signout" method="post"><button type="submit" className="dashboard-signout">Sign out</button></form></div>
+      <div className="dashboard-sidebar-bottom"><Link href="/" className="dashboard-return"><DashboardIcon name="home" size={16} /> <span>Return to website</span></Link><form action="/auth/signout" method="post"><button type="submit" className="dashboard-signout"><DashboardIcon name="logout" size={16} /> <span>Sign out</span></button></form></div>
     </aside>
-    <div className="dashboard-content"><header className="dashboard-mobile-top"><Link href="/" className="dashboard-mobile-brand"><BrandMark /><span>DETAILFLOW</span></Link><details className="dashboard-mobile-menu"><summary>Menu</summary><div><DashboardNav items={nav} /><Link href="/" className="dashboard-return">← Return to website</Link><form action="/auth/signout" method="post"><button type="submit" className="dashboard-signout">Sign out</button></form></div></details><Link href={role === "admin" ? "/admin" : "/account"} className="dashboard-mobile-account">{displayName}</Link></header>{children}</div>
+    <div className="dashboard-content"><header className="dashboard-mobile-top"><Link href="/" className="dashboard-mobile-brand"><BrandMark /><span>DETAILFLOW</span></Link><details className="dashboard-mobile-menu"><summary className="dashboard-mobile-menu-summary"><span>Menu</span></summary><div><DashboardNav items={nav} /><Link href="/" className="dashboard-return"><DashboardIcon name="home" size={16} /> <span>Return to website</span></Link><form action="/auth/signout" method="post"><button type="submit" className="dashboard-signout"><DashboardIcon name="logout" size={16} /> <span>Sign out</span></button></form></div></details><Link href={role === "admin" ? "/admin" : "/account"} className="dashboard-mobile-account">{displayName}</Link></header>{children}</div>
   </div>;
 }

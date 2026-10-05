@@ -3,6 +3,7 @@ import Link from "next/link";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { getAdminContext } from "@/lib/admin-page";
 import { StatusBadge } from "@/components/status-badge";
+import { DashboardIcon, type DashboardIconName } from "@/components/dashboard/dashboard-icon";
 
 export const metadata: Metadata = { title: "Admin dashboard" };
 
@@ -59,20 +60,20 @@ export default async function AdminPage() {
         </div>
         <div className="dashboard-view-actions">
           <span className="admin-verified">Admin verified</span>
-          <Link href="/admin/bookings" className="dashboard-primary-action">Open appointments <span aria-hidden="true">↗</span></Link>
+          <Link href="/admin/bookings" className="dashboard-primary-action">Open appointments <DashboardIcon name="external" size={15} /></Link>
         </div>
       </div>
       <p className="dashboard-overview-identity">Signed in as {user?.email}</p>
 
       <div className="admin-metrics">
-        <Metric label="Today" value={overview?.today_bookings} detail="Appointments in studio time" unavailable={Boolean(overviewError)} primary />
-        <Metric label="Upcoming" value={overview?.upcoming_bookings} detail="Requested, confirmed, or in service" unavailable={Boolean(overviewError)} />
-        <Metric label="Requests" value={overview?.requested_bookings} detail="Awaiting confirmation" unavailable={Boolean(overviewError)} />
-        <Metric label="Completed" value={overview?.completed_bookings} detail="All-time completed visits" unavailable={Boolean(overviewError)} />
-        <Metric label="Customers" value={overview?.customer_count} detail="Registered accounts" unavailable={Boolean(overviewError)} />
-        <Metric label="Booked value" value={overview ? formatCurrency(overview.booked_value_cents / 100) : undefined} detail="Scheduled value, not collected revenue" unavailable={Boolean(overviewError)} />
-        <Metric label="Services" value={overview?.active_services} detail="Public menu items" unavailable={Boolean(overviewError)} />
-        <Metric label="Total bookings" value={overview?.total_bookings} detail="Live database records" unavailable={Boolean(overviewError)} />
+        <Metric icon="calendar" label="Today" value={overview?.today_bookings} detail="Appointments in studio time" unavailable={Boolean(overviewError)} primary />
+        <Metric icon="calendar" label="Upcoming" value={overview?.upcoming_bookings} detail="Requested, confirmed, or in service" unavailable={Boolean(overviewError)} />
+        <Metric icon="ticket" label="Requests" value={overview?.requested_bookings} detail="Awaiting confirmation" unavailable={Boolean(overviewError)} />
+        <Metric icon="overview" label="Completed" value={overview?.completed_bookings} detail="All-time completed visits" unavailable={Boolean(overviewError)} />
+        <Metric icon="users" label="Customers" value={overview?.customer_count} detail="Registered accounts" unavailable={Boolean(overviewError)} />
+        <Metric icon="ticket" label="Booked value" value={overview ? formatCurrency(overview.booked_value_cents / 100) : undefined} detail="Scheduled value, not collected revenue" unavailable={Boolean(overviewError)} />
+        <Metric icon="services" label="Services" value={overview?.active_services} detail="Public menu items" unavailable={Boolean(overviewError)} />
+        <Metric icon="overview" label="Total bookings" value={overview?.total_bookings} detail="Live database records" unavailable={Boolean(overviewError)} />
       </div>
 
       <div className="dashboard-grid admin-overview-grid">
@@ -104,8 +105,8 @@ function AdminBookingRow({ booking, timezone }: { booking: AdminBooking; timezon
   return <Link href={`/admin/bookings/${booking.id}`} className="dashboard-list-row"><div><div className="dashboard-list-title"><strong>{booking.service_name}</strong><StatusBadge status={booking.status} /></div><p>{formatDate(booking.starts_at, timezone)} · {booking.customer_email ?? "Customer"}</p><small>{booking.vehicle_description} · Ref {booking.reference}</small></div><span className="dashboard-list-price">{formatCurrency(booking.total_price_cents / 100)} <span aria-hidden="true">↗</span></span></Link>;
 }
 
-function Metric({ label, value, detail, primary = false, unavailable = false }: { label: string; value: number | string | undefined; detail: string; primary?: boolean; unavailable?: boolean }) {
-  return <div className={`admin-metric ${primary ? "admin-metric-primary" : ""}`}><span>{label}</span><strong>{unavailable ? "—" : (value ?? "—")}</strong><small>{unavailable ? "Unavailable" : detail}</small></div>;
+function Metric({ icon, label, value, detail, primary = false, unavailable = false }: { icon: DashboardIconName; label: string; value: number | string | undefined; detail: string; primary?: boolean; unavailable?: boolean }) {
+  return <div className={`admin-metric ${primary ? "admin-metric-primary" : ""}`}><span className="admin-metric-icon"><DashboardIcon name={icon} size={16} /></span><span>{label}</span><strong>{unavailable ? "—" : (value ?? "—")}</strong><small>{unavailable ? "Unavailable" : detail}</small></div>;
 }
 
 function AdminDenied() {
