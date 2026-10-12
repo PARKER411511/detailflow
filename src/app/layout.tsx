@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import Script from "next/script";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -14,5 +15,19 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en" data-scroll-behavior="smooth" className={`${geist.variable} ${barlow.variable} antialiased`}><body className="min-h-screen bg-[var(--surface)] text-[var(--ink)]"><SiteFrame header={<SiteHeader />} footer={<SiteFooter />}><main>{children}</main></SiteFrame></body></html>;
+  return (
+    <html lang="en" data-scroll-behavior="smooth" className={`${geist.variable} ${barlow.variable} antialiased`}>
+      <body className="min-h-screen bg-[var(--surface)] text-[var(--ink)]">
+        <SiteFrame header={<SiteHeader />} footer={<SiteFooter />}><main>{children}</main></SiteFrame>
+        <Script
+          id="kivohelp-widget"
+          src="https://relay-ai-iota.vercel.app/widget.js"
+          strategy="afterInteractive"
+          async
+          data-kivohelp-workspace="f28fa3ca-4a37-44c0-8531-945915c4ab1a"
+          data-kivohelp-key="a3043e644fdc2758bde9fc24eeb9d6d2a75c"
+        />
+      </body>
+    </html>
+  );
 }
