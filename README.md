@@ -77,7 +77,7 @@ Service photos use the public `service-images` Supabase Storage bucket. Only adm
 
 ## KivoHelp widget
 
-The existing KivoHelp widget loads globally from `https://relay-ai-iota.vercel.app/widget.js` through `next/script` in `src/app/layout.tsx`. It loads asynchronously after hydration and stays mounted across client navigation. The workspace ID and browser embed key are intentionally public; no server secret or environment variable is required.
+The existing KivoHelp widget loads globally from `https://kivohelp.com/widget.js` through `next/script` in `src/app/layout.tsx`. It loads asynchronously after hydration and stays mounted across client navigation. The workspace ID and browser embed key are intentionally public; no server secret or environment variable is required.
 
 Manage the widget's appearance, model, knowledge, limits, and support settings in KivoHelp. The production origin `https://detailflow-zeta-liart.vercel.app` is already registered under KivoHelp → Install. To verify an installation, open that origin on desktop and mobile, open and close the launcher, send a real question, then navigate to another page using the site's links and confirm only one widget remains. Localhost and other preview origins depend on KivoHelp's allowed-origin settings.
 

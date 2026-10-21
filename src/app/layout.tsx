@@ -21,7 +21,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <SiteFrame header={<SiteHeader />} footer={<SiteFooter />}><main>{children}</main></SiteFrame>
         <Script
           id="kivohelp-widget"
-          src="https://relay-ai-iota.vercel.app/widget.js"
+          src="https://kivohelp.com/widget.js"
           strategy="afterInteractive"
           async
           data-kivohelp-workspace="f28fa3ca-4a37-44c0-8531-945915c4ab1a"
